@@ -4,9 +4,19 @@ A minimal, static personal brand site: coaching, digital products, and creative 
 No build step — plain HTML/CSS/JS, so it deploys to Vercel as-is.
 
 ## Files
-- `index.html` — page structure and content
+- `index.html` — page structure only, references text via `data-i18n="section.field"` attributes
+- `content.js` — **all page text lives here**, in English and Thai, organized by section. This is the file to edit when you want to change wording.
 - `styles.css` — all styling (colors/fonts as CSS variables at the top)
-- `script.js` — mobile nav toggle, footer year, demo contact form handler
+- `script.js` — mobile nav toggle, footer year, contact form handler, and the EN/TH language-switching logic (reads from `content.js`)
+
+## Editing text
+Open `content.js`. Each section (hero, services, ventures, creative, about, contact) has plain English/Thai pairs, e.g.:
+```js
+hero: {
+  headline: { en: "I build the systems...", th: "ฉันสร้างระบบ..." }
+}
+```
+Change the text inside the quotes, save, and push — no HTML or JS knowledge needed for wording changes. Just make sure to keep the quotes and commas intact.
 
 ## Deploy with GitHub + Vercel
 
