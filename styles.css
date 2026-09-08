@@ -1,10 +1,10 @@
 :root {
-  --ink: #13161C;
-  --paper: #F7F6F2;
-  --graphite: #5B6069;
-  --line: #DFDCD4;
-  --amber: #A9752F;
-  --amber-deep: #8A5F24;
+  --ink: #1D3A50;
+  --paper: #E7EEF3;
+  --graphite: #587187;
+  --line: #C9D7E1;
+  --amber: #2C5F82;
+  --amber-deep: #1D3A50;
   --max-width: 1080px;
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -352,7 +352,7 @@ h1, h2, h3 {
 
 .about-photo {
   aspect-ratio: 4 / 5;
-  background: linear-gradient(155deg, #DAD5C8, #B9AF9A);
+  background: linear-gradient(155deg, #C9D7E1, #7E9CB1);
   border-radius: 3px;
 }
 
