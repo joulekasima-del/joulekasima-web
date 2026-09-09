@@ -42,12 +42,11 @@ const SITE_CONTENT = {
   ventures: {
     title: { en: 'Ventures', th: 'โปรเจกต์' },
     intro: {
-      en: "Things I've built myself, alongside client work — some live, some still taking shape.",
-      th: 'สิ่งที่ลงมือสร้างเองควบคู่ไปกับงานลูกค้า บางอย่างเปิดใช้งานแล้ว บางอย่างยังอยู่ระหว่างพัฒนา'
+      en: 'Everything here grows from the same instinct as the client work — customer service and hospitality, turned into things that stand on their own. Some are live, some still taking shape.',
+      th: 'ทุกอย่างที่นี่เติบโตมาจากสัญชาตญาณเดียวกับงานลูกค้า คือการบริการและการต้อนรับที่ถูกเปลี่ยนให้เป็นสิ่งที่ยืนได้ด้วยตัวเอง บางอย่างเปิดใช้งานแล้ว บางอย่างยังอยู่ระหว่างพัฒนา'
     },
 
     thaiTalkBreaks: {
-      eyebrow: { en: 'Launching this week', th: 'เปิดตัวสัปดาห์นี้' },
       tagline: { en: 'Learn to actually speak Thai — one small break a day.', th: 'เรียนพูดภาษาไทยได้จริง วันละนิด ทุกวัน' },
       desc: {
         en: 'Thai Talk Breaks is a 30-day conversational Thai course built for real life, not textbooks. Each day brings one picture, one useful phrase, clear native pronunciation, and a quick explanation you can use right away. No Thai script required — just Thai you can understand, say, and use.',
@@ -61,8 +60,8 @@ const SITE_CONTENT = {
         { en: 'Free for 7 days, then continue with Telegram Stars', th: 'ฟรี 7 วันแรก จากนั้นชำระต่อผ่าน Telegram Stars' }
       ],
       community: {
-        en: 'Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community, hosted by Chaa-yen.',
-        th: 'อยากฝึกเพิ่มเติมไหม? เข้าร่วม <strong>Thai Talk: Jot It Down</strong> กิจกรรมฝึกภาษาทุกเช้าวันเสาร์กับชุมชน จัดโดยชาเย็น'
+        en: 'Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community.',
+        th: 'อยากฝึกเพิ่มเติมไหม? เข้าร่วม <strong>Thai Talk: Jot It Down</strong> กิจกรรมฝึกภาษาทุกเช้าวันเสาร์กับชุมชน'
       },
       btnTrial:     { en: 'Start your free 7 days', th: 'เริ่มทดลองฟรี 7 วัน' },
       btnCommunity: { en: 'Join the community', th: 'เข้าร่วมชุมชน' }

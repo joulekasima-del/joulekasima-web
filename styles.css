@@ -344,6 +344,35 @@ body.lang-th .hero-headline {
 
 .spotlight-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
+.btn-telegram,
+.btn-telegram-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-telegram {
+  background: #29A9EA;
+  color: #fff;
+}
+.btn-telegram:hover { background: #1E93D1; }
+
+.btn-telegram-ghost {
+  background: transparent;
+  color: #1D8ECF;
+  border-color: #29A9EA;
+}
+.btn-telegram-ghost:hover {
+  background: rgba(41, 169, 234, 0.08);
+  border-color: #1E93D1;
+}
+
+.tg-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 /* Quiet ventures + creative placeholder */
 .ventures-quiet {
   display: grid;
