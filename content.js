@@ -9,11 +9,11 @@
 const SITE_CONTENT = {
 
   hero: {
-    kicker:   { en: 'Bot development · Ventures · Creative work', th: 'พัฒนาบอท · โปรเจกต์ · งานสร้างสรรค์' },
-    headline: { en: 'I build the systems behind fast replies and new ideas.', th: 'ฉันสร้างระบบที่อยู่เบื้องหลังการตอบกลับที่รวดเร็วและไอเดียใหม่ ๆ' },
+    kicker:   { en: "Bot development · Ventures · Field Notes", th: "พัฒนาบอท · โปรเจกต์ · Field Notes" },
+    headline: { en: "I build things that make people feel taken care of.", th: "ฉันสร้างสิ่งที่ทำให้คนรู้สึกได้รับการดูแล" },
     sub: {
-      en: "I'm Joule Kasima — I build automation for businesses on Instagram, Facebook, and Telegram, plus a handful of things I've built myself.",
-      th: 'ฉันคือ Joule Kasima สร้างระบบอัตโนมัติให้ธุรกิจบน Instagram, Facebook และ Telegram พร้อมกับโปรเจกต์ส่วนตัวอีกไม่กี่อย่างที่ลงมือทำเอง'
+      en: "I'm Joule Kasima — ten years in customer service, now channeled into bot automation for businesses and ventures like Thai Talk Breaks and Journey Planner. Every one of them starts from the same idea: make people feel looked after.",
+      th: 'ฉันคือ Joule Kasima ประสบการณ์ 10 ปีในงานบริการลูกค้า ที่ตอนนี้ถ่ายทอดสู่ระบบบอทอัตโนมัติสำหรับธุรกิจ และโปรเจกต์ต่าง ๆ อย่าง Thai Talk Breaks และ Journey Planner ทุกอย่างเริ่มต้นจากความคิดเดียวกัน คือทำให้ทุกคนรู้สึกว่ามีคนดูแล'
     },
     btnPrimary: { en: "See what I'm building", th: 'ดูสิ่งที่กำลังสร้าง' },
     btnGhost:   { en: 'Bot development', th: 'พัฒนาบอท' }
