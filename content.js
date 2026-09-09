@@ -84,14 +84,14 @@ const SITE_CONTENT = {
     },
 
     kraftJunction: {
-      desc:   { en: 'Event organizing — launching soon.', th: 'จัดกิจกรรมและอีเวนต์ เปิดตัวเร็ว ๆ นี้' },
+      desc:   { en: 'Event organizing where tradition craft meets 21st-century craft. Launching soon.', th: 'จัดกิจกรรมและอีเวนต์ที่ผสานงานฝีมือดั้งเดิมเข้ากับงานฝีมือยุคใหม่ เปิดตัวเร็ว ๆ นี้' },
       status: { en: 'Coming soon', th: 'เร็ว ๆ นี้' }
     }
   },
 
   creative: {
     title: { en: 'Creative', th: 'งานสร้างสรรค์' },
-    desc:  { en: 'New work in progress — check back soon.', th: 'งานใหม่กำลังอยู่ระหว่างทำ แวะมาดูอีกครั้งเร็ว ๆ นี้' }
+    desc:  { en: 'Research, writing, and the occasional blog post — coming soon.', th: 'งานวิจัย งานเขียน และบล็อกเป็นครั้งคราว เร็ว ๆ นี้' }
   },
 
   about: {
