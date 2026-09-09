@@ -207,15 +207,11 @@ body.lang-th .hero-headline {
 /* Intro */
 .intro { padding: 56px 32px 0; }
 .intro-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 40px;
   border-top: 1px solid var(--line);
   padding-top: 40px;
-  align-items: start;
 }
-.intro h2 { font-size: 28px; }
-.intro-text { color: var(--graphite); margin: 0; }
+.intro h2 { font-size: 28px; margin-bottom: 16px; }
+.intro-text { color: var(--graphite); margin: 0; max-width: 620px; }
 
 /* Tracks */
 .tracks {
@@ -493,7 +489,7 @@ body.lang-th .hero-headline {
   .track { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-right: 0; }
   .track:first-child { border-top: none; }
   .track-premium:first-child { padding-left: 0; }
-  .intro-grid, .about-grid { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; }
   .about-photo { aspect-ratio: 16 / 9; }
   .ventures-quiet { grid-template-columns: 1fr; }
   .spotlight-card { padding: 28px 24px; }
