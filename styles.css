@@ -157,8 +157,33 @@ body.lang-th .hero-headline {
 
 /* Hero */
 .hero {
+  position: relative;
   padding: 96px 32px 72px;
   max-width: 780px;
+}
+
+.hero-3d {
+  position: absolute;
+  top: 30px;
+  left: 100%;
+  margin-left: -30px;
+  width: 340px;
+  height: 420px;
+  pointer-events: none;
+  opacity: 0.55;
+  z-index: 0;
+}
+
+.hero-kicker,
+.hero-headline,
+.hero-sub,
+.hero-actions {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 1100px) {
+  .hero-3d { display: none; }
 }
 
 .hero-kicker {
