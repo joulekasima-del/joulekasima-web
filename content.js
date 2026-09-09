@@ -9,14 +9,11 @@
 const SITE_CONTENT = {
 
   hero: {
-    kicker:   { en: "Bot development · Ventures · Field Notes", th: "พัฒนาบอท · โปรเจกต์ · Field Notes" },
     headline: { en: "I build things that make people feel taken care of.", th: "ฉันสร้างสิ่งที่ทำให้คนรู้สึกได้รับการดูแล" },
     sub: {
       en: "I'm Joule Kasima — ten years in customer service, now channeled into bot automation for businesses and ventures like Thai Talk Breaks and Journey Planner. Every one of them starts from the same idea: make people feel looked after.",
       th: 'ฉันคือ Joule Kasima ประสบการณ์ 10 ปีในงานบริการลูกค้า ที่ตอนนี้ถ่ายทอดสู่ระบบบอทอัตโนมัติสำหรับธุรกิจ และโปรเจกต์ต่าง ๆ อย่าง Thai Talk Breaks และ Journey Planner ทุกอย่างเริ่มต้นจากความคิดเดียวกัน คือทำให้ทุกคนรู้สึกว่ามีคนดูแล'
-    },
-    btnPrimary: { en: "See what I'm building", th: 'ดูสิ่งที่กำลังสร้าง' },
-    btnGhost:   { en: 'Bot development', th: 'พัฒนาบอท' }
+    }
   },
 
   services: {
@@ -25,17 +22,14 @@ const SITE_CONTENT = {
       desc: {
         en: 'Rule-based bots for Instagram, Facebook, and Telegram — FAQs, order status, booking flows, answered instantly. Fast to set up, predictable, reliable.',
         th: 'บอทแบบตั้งกฎสำหรับ Instagram, Facebook และ Telegram ตอบคำถามที่พบบ่อย สถานะคำสั่งซื้อ และขั้นตอนการจองได้ทันที ติดตั้งไว ผลลัพธ์แน่นอน เชื่อถือได้'
-      },
-      link: { en: 'Get a bot built', th: 'เริ่มสร้างบอท' }
+      }
     },
     ai: {
-      badge: { en: 'New', th: 'ใหม่' },
       title: { en: 'AI bots', th: 'บอท AI' },
       desc: {
         en: "Conversational bots that handle follow-up questions and nuance a script can't. Built for any business that's drowning in DMs and wants replies to feel like a real conversation.",
         th: 'บอทสนทนาที่ตอบคำถามต่อเนื่องและรายละเอียดที่สคริปต์ทำไม่ได้ เหมาะกับธุรกิจที่มีข้อความเข้ามาจำนวนมากและอยากให้การตอบรู้สึกเหมือนคุยกับคนจริง'
-      },
-      link: { en: 'Get a bot built', th: 'เริ่มสร้างบอท' }
+      }
     }
   },
 
@@ -62,22 +56,18 @@ const SITE_CONTENT = {
       community: {
         en: 'Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community.',
         th: 'อยากฝึกเพิ่มเติมไหม? เข้าร่วม <strong>Thai Talk: Jot It Down</strong> กิจกรรมฝึกภาษาทุกเช้าวันเสาร์กับชุมชน'
-      },
-      btnTrial:     { en: 'Start your free 7 days', th: 'เริ่มทดลองฟรี 7 วัน' },
-      btnCommunity: { en: 'Join the community', th: 'เข้าร่วมชุมชน' }
+      }
     },
 
     journeyPlanner: {
       desc: {
         en: 'A travel planning platform for conservation-based trips in Thailand, with AI woven into how it plans. Still experimenting — details coming soon.',
         th: 'แพลตฟอร์มวางแผนการเดินทางเพื่อการท่องเที่ยวเชิงอนุรักษ์ในประเทศไทย ผสาน AI เข้ากับการวางแผน ยังอยู่ระหว่างทดลอง รายละเอียดเร็ว ๆ นี้'
-      },
-      status: { en: 'In development', th: 'กำลังพัฒนา' }
+      }
     },
 
     kraftJunction: {
-      desc:   { en: 'Event organizing where tradition craft meets 21st-century craft. Launching soon.', th: 'จัดกิจกรรมและอีเวนต์ที่ผสานงานฝีมือดั้งเดิมเข้ากับงานฝีมือยุคใหม่ เปิดตัวเร็ว ๆ นี้' },
-      status: { en: 'Coming soon', th: 'เร็ว ๆ นี้' }
+      desc: { en: 'Event organizing where tradition craft meets 21st-century craft. Launching soon.', th: 'จัดกิจกรรมและอีเวนต์ที่ผสานงานฝีมือดั้งเดิมเข้ากับงานฝีมือยุคใหม่ เปิดตัวเร็ว ๆ นี้' }
     }
   },
 
@@ -90,8 +80,7 @@ const SITE_CONTENT = {
     desc: {
       en: "I'm Joule Kasima, based in Chiang Mai. I build messaging automation for businesses and spend the rest of my time building my own things — Journey Planner, Kraft Junction, and whatever's next.",
       th: 'ฉันคือ Joule Kasima อาศัยอยู่ที่เชียงใหม่ สร้างระบบข้อความอัตโนมัติให้ธุรกิจ และใช้เวลาที่เหลือสร้างโปรเจกต์ของตัวเอง อย่าง Journey Planner, Kraft Junction และสิ่งต่อไปที่กำลังจะมา'
-    },
-    link: { en: 'Get in touch', th: 'ติดต่อฉัน' }
+    }
   },
 
   contact: {
@@ -103,7 +92,6 @@ const SITE_CONTENT = {
     labelName:    { en: 'Name', th: 'ชื่อ' },
     labelEmail:   { en: 'Email', th: 'อีเมล' },
     labelMessage: { en: "What's on your mind", th: 'มีอะไรอยากบอกไหม' },
-    btnSend:      { en: 'Send message', th: 'ส่งข้อความ' },
     formNote: {
       en: 'Thanks — this is a demo form. Connect it to Formspree, Resend, or a similar service before launch.',
       th: 'ขอบคุณค่ะ — ฟอร์มนี้เป็นเดโม โปรดเชื่อมต่อกับ Formspree, Resend หรือบริการที่คล้ายกันก่อนเปิดใช้งานจริง'
