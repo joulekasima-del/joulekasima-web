@@ -8,13 +8,6 @@
 
 const SITE_CONTENT = {
 
-  nav: {
-    services: { en: 'Services', th: 'บริการ' },
-    ventures: { en: 'Ventures', th: 'โปรเจกต์' },
-    creative: { en: 'Creative', th: 'งานสร้างสรรค์' },
-    contact:  { en: 'Contact',  th: 'ติดต่อ' }
-  },
-
   hero: {
     kicker:   { en: 'Bot development · Ventures · Creative work', th: 'พัฒนาบอท · โปรเจกต์ · งานสร้างสรรค์' },
     headline: { en: 'I build the systems behind fast replies and new ideas.', th: 'ฉันสร้างระบบที่อยู่เบื้องหลังการตอบกลับที่รวดเร็วและไอเดียใหม่ ๆ' },
@@ -90,7 +83,6 @@ const SITE_CONTENT = {
   },
 
   creative: {
-    title: { en: 'Creative', th: 'งานสร้างสรรค์' },
     desc:  { en: 'Research, writing, and the occasional blog post — coming soon.', th: 'งานวิจัย งานเขียน และบล็อกเป็นครั้งคราว เร็ว ๆ นี้' }
   },
 
