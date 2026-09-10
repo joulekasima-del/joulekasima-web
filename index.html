@@ -7,7 +7,7 @@
 <meta name="description" content="Joule Kasima — bot development, and the ventures I'm building: Thai Talk Breaks, Journey Planner, Kraft Junction.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+Thai:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -15,11 +15,6 @@
 <header class="site-header">
   <div class="wrap header-row">
     <a href="#top" class="wordmark">Joule Kasima</a>
-    <div class="lang-switch" role="group" aria-label="Language switch">
-      <button type="button" class="lang-btn is-active" data-lang="en">EN</button>
-      <span class="lang-sep">/</span>
-      <button type="button" class="lang-btn" data-lang="th">TH</button>
-    </div>
     <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
@@ -36,8 +31,8 @@
   <section class="hero wrap">
     <canvas id="heroCanvas" class="hero-3d" aria-hidden="true"></canvas>
     <p class="hero-kicker">Ventures · Field Notes</p>
-    <h1 class="hero-headline" data-i18n="hero.headline">I build things that make people feel taken care of.</h1>
-    <p class="hero-sub" data-i18n="hero.sub">I'm Joule Kasima. Ten years in customer service taught me that people remember how you made them feel — so now I build ventures around that idea, like Thai Talk Breaks and Journey Planner.</p>
+    <h1 class="hero-headline">I build things that make people feel taken care of.</h1>
+    <p class="hero-sub">I'm Joule Kasima. Ten years in customer service taught me that people remember how you made them feel — so now I build ventures around that idea, like Thai Talk Breaks and Journey Planner.</p>
     <div class="hero-actions">
       <a href="#ventures" class="btn btn-primary">See what I'm building</a>
     </div>
@@ -45,24 +40,24 @@
 
   <section class="intro wrap" id="ventures">
     <div class="intro-grid">
-      <h2 data-i18n="ventures.title">Ventures</h2>
-      <p class="intro-text" data-i18n="ventures.intro">Things I've built myself, alongside client work — some live, some still taking shape.</p>
+      <h2>Ventures</h2>
+      <p class="intro-text">Everything here grows from the same instinct as the client work — customer service and hospitality, turned into things that stand on their own. Some are live, some still taking shape.</p>
     </div>
   </section>
 
   <section class="spotlight wrap">
     <div class="spotlight-card">
       <h3 class="spotlight-title">Thai Talk Breaks</h3>
-      <p class="spotlight-tagline" data-i18n="ventures.thaiTalkBreaks.tagline">Learn to actually speak Thai — one small break a day.</p>
-      <p class="spotlight-desc" data-i18n="ventures.thaiTalkBreaks.desc">Thai Talk Breaks is a 30-day conversational Thai course built for real life, not textbooks. Each day brings one picture, one useful phrase, clear native pronunciation, and a quick explanation you can use right away. No Thai script required — just Thai you can understand, say, and use.</p>
-      <p class="spotlight-trial" data-i18n="ventures.thaiTalkBreaks.trial">Your first 7 days are free.</p>
+      <p class="spotlight-tagline">Learn to actually speak Thai — one small break a day.</p>
+      <p class="spotlight-desc">Thai Talk Breaks is a 30-day conversational Thai course built for real life, not textbooks. Each day brings one picture, one useful phrase, clear native pronunciation, and a quick explanation you can use right away. No Thai script required — just Thai you can understand, say, and use.</p>
+      <p class="spotlight-trial">Your first 7 days are free.</p>
       <ul class="spotlight-list">
-        <li data-i18n="ventures.thaiTalkBreaks.list.0">30 days of short, practical daily lessons</li>
-        <li data-i18n="ventures.thaiTalkBreaks.list.1">One phrase, one picture, real native pronunciation — every day</li>
-        <li data-i18n="ventures.thaiTalkBreaks.list.2">No alphabet or grammar drills, just speaking</li>
-        <li data-i18n="ventures.thaiTalkBreaks.list.3">Free for 7 days, then continue with Telegram Stars</li>
+        <li>30 days of short, practical daily lessons</li>
+        <li>One phrase, one picture, real native pronunciation — every day</li>
+        <li>No alphabet or grammar drills, just speaking</li>
+        <li>Free for 7 days, then continue with Telegram Stars</li>
       </ul>
-      <p class="spotlight-community" data-i18n="ventures.thaiTalkBreaks.community">Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community, hosted by Chaa-yen.</p>
+      <p class="spotlight-community">Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community.</p>
       <div class="spotlight-actions">
         <a href="https://t.me/ThaiTalkBreaksBot" class="btn btn-telegram">
           <svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.751-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
@@ -79,13 +74,13 @@
   <section class="ventures-quiet wrap">
     <article class="quiet-card">
       <h4 class="quiet-title">Journey Planner</h4>
-      <p class="quiet-desc" data-i18n="ventures.journeyPlanner.desc">A travel planning platform for conservation-based trips in Thailand, with AI woven into how it plans. Still experimenting — details coming soon.</p>
+      <p class="quiet-desc">A travel planning platform for conservation-based trips in Thailand, with AI woven into how it plans. Still experimenting — details coming soon.</p>
       <span class="quiet-status">In development</span>
     </article>
 
     <article class="quiet-card">
       <h4 class="quiet-title">Kraft Junction</h4>
-      <p class="quiet-desc" data-i18n="ventures.kraftJunction.desc">Event organizing — launching soon.</p>
+      <p class="quiet-desc">Event organizing where tradition craft meets 21st-century craft. Launching soon.</p>
       <span class="quiet-status">Coming soon</span>
     </article>
   </section>
@@ -93,7 +88,7 @@
   <section class="creative wrap" id="creative">
     <div class="creative-card">
       <h4 class="quiet-title">Field Notes</h4>
-      <p class="quiet-desc" data-i18n="creative.desc">New work in progress — check back soon.</p>
+      <p class="quiet-desc">Research, writing, and the occasional blog post — coming soon.</p>
     </div>
   </section>
 
@@ -101,31 +96,31 @@
     <div class="about-grid">
       <div class="about-photo" aria-hidden="true"></div>
       <div class="about-copy">
-        <h2 data-i18n="about.title">About</h2>
-        <p data-i18n="about.desc">I'm Joule Kasima, based in Chiang Mai. I build messaging automation for businesses and spend the rest of my time building my own things — Journey Planner, Kraft Junction, and whatever's next.</p>
+        <h2>About</h2>
+        <p>I'm Joule Kasima, based in Chiang Mai. I build messaging automation for businesses and spend the rest of my time building my own things — Journey Planner, Kraft Junction, and whatever's next.</p>
         <a href="#contact" class="text-link">Get in touch</a>
       </div>
     </div>
   </section>
 
   <section class="contact wrap" id="contact">
-    <h2 data-i18n="contact.title">Let's talk</h2>
-    <p class="contact-sub" data-i18n="contact.sub">Need a bot built, or just want to say hi? Send a note — I read every one.</p>
+    <h2>Let's talk</h2>
+    <p class="contact-sub">Need a bot built, or just want to say hi? Send a note — I read every one.</p>
     <form class="contact-form" id="contactForm">
       <div class="form-row">
-        <label for="name" data-i18n="contact.labelName">Name</label>
+        <label for="name">Name</label>
         <input type="text" id="name" name="name" required>
       </div>
       <div class="form-row">
-        <label for="email" data-i18n="contact.labelEmail">Email</label>
+        <label for="email">Email</label>
         <input type="email" id="email" name="email" required>
       </div>
       <div class="form-row">
-        <label for="message" data-i18n="contact.labelMessage">What's on your mind</label>
+        <label for="message">What's on your mind</label>
         <textarea id="message" name="message" rows="4" required></textarea>
       </div>
       <button type="submit" class="btn btn-primary">Send message</button>
-      <p class="form-note" id="formNote" hidden data-i18n="contact.formNote">Thanks — this is a demo form. Connect it to Formspree, Resend, or a similar service before launch.</p>
+      <p class="form-note" id="formNote" hidden>Thanks — this is a demo form. Connect it to Formspree, Resend, or a similar service before launch.</p>
     </form>
   </section>
 
@@ -142,7 +137,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="hero-scene.js"></script>
-<script src="content.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

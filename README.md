@@ -1,22 +1,16 @@
-# Joule Kasima — Starter Site
+# Joule Kasima — Site
 
-A minimal, static personal brand site: coaching, digital products, and creative work.
+A minimal, static personal brand site: bot ventures and field notes.
 No build step — plain HTML/CSS/JS, so it deploys to Vercel as-is.
 
 ## Files
-- `index.html` — page structure only, references text via `data-i18n="section.field"` attributes
-- `content.js` — **all page text lives here**, in English and Thai, organized by section. This is the file to edit when you want to change wording.
+- `index.html` — all page structure and text content, in English
 - `styles.css` — all styling (colors/fonts as CSS variables at the top)
-- `script.js` — mobile nav toggle, footer year, contact form handler, and the EN/TH language-switching logic (reads from `content.js`)
+- `script.js` — mobile nav toggle, footer year, contact form handler
+- `hero-scene.js` — the animated wireframe 3D background in the Hero section (Three.js, loaded from CDN)
 
 ## Editing text
-Open `content.js`. Each section (hero, services, ventures, creative, about, contact) has plain English/Thai pairs, e.g.:
-```js
-hero: {
-  headline: { en: "I build the systems...", th: "ฉันสร้างระบบ..." }
-}
-```
-Change the text inside the quotes, save, and push — no HTML or JS knowledge needed for wording changes. Just make sure to keep the quotes and commas intact.
+Since the site is single-language, text lives directly in `index.html`. Find the relevant section and edit the text inside the tags directly — no separate content file to manage.
 
 ## Deploy with GitHub + Vercel
 
@@ -36,7 +30,7 @@ Change the text inside the quotes, save, and push — no HTML or JS knowledge ne
 
 ## Content status
 
-Hero, Services, Ventures (Thai Talk Breaks spotlight + Journey Planner/Kraft Junction placeholders), Creative, About, and Contact copy are all finalized and in `index.html`.
+Hero, Ventures (Thai Talk Breaks spotlight + Journey Planner/Kraft Junction placeholders), Field Notes, About, and Contact copy are all finalized and in `index.html`. Services section was removed; Ventures is now the first section after the Hero.
 
 ## Before you launch
 

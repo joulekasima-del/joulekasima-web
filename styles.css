@@ -73,48 +73,6 @@ h1, h2, h3 {
   letter-spacing: -0.01em;
 }
 
-/* Language switch */
-.lang-switch {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: 20px;
-  font-size: 13px;
-}
-
-.lang-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 2px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--graphite);
-}
-.lang-btn.is-active {
-  color: var(--ink);
-  font-weight: 600;
-  border-bottom: 1px solid var(--amber);
-}
-.lang-sep { color: var(--line); }
-
-/* Thai typography */
-body.lang-th {
-  --font-display: "Noto Serif Thai", serif;
-  --font-body: "Noto Sans Thai", sans-serif;
-  line-height: 1.75;
-}
-body.lang-th h1,
-body.lang-th h2,
-body.lang-th h3,
-body.lang-th .spotlight-title {
-  line-height: 1.4;
-}
-body.lang-th .hero-headline {
-  line-height: 1.35;
-}
-
 .primary-nav {
   display: flex;
   align-items: center;
