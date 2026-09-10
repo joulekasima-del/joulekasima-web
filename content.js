@@ -11,25 +11,8 @@ const SITE_CONTENT = {
   hero: {
     headline: { en: "I build things that make people feel taken care of.", th: "ฉันสร้างสิ่งที่ทำให้คนรู้สึกได้รับการดูแล" },
     sub: {
-      en: "I'm Joule Kasima — ten years in customer service, now channeled into bot automation for businesses and ventures like Thai Talk Breaks and Journey Planner. Every one of them starts from the same idea: make people feel looked after.",
-      th: 'ฉันคือ Joule Kasima ประสบการณ์ 10 ปีในงานบริการลูกค้า ที่ตอนนี้ถ่ายทอดสู่ระบบบอทอัตโนมัติสำหรับธุรกิจ และโปรเจกต์ต่าง ๆ อย่าง Thai Talk Breaks และ Journey Planner ทุกอย่างเริ่มต้นจากความคิดเดียวกัน คือทำให้ทุกคนรู้สึกว่ามีคนดูแล'
-    }
-  },
-
-  services: {
-    standard: {
-      title: { en: 'Standard auto-reply bots', th: 'บอทตอบกลับอัตโนมัติ' },
-      desc: {
-        en: 'Rule-based bots for Instagram, Facebook, and Telegram — FAQs, order status, booking flows, answered instantly. Fast to set up, predictable, reliable.',
-        th: 'บอทแบบตั้งกฎสำหรับ Instagram, Facebook และ Telegram ตอบคำถามที่พบบ่อย สถานะคำสั่งซื้อ และขั้นตอนการจองได้ทันที ติดตั้งไว ผลลัพธ์แน่นอน เชื่อถือได้'
-      }
-    },
-    ai: {
-      title: { en: 'AI bots', th: 'บอท AI' },
-      desc: {
-        en: "Conversational bots that handle follow-up questions and nuance a script can't. Built for any business that's drowning in DMs and wants replies to feel like a real conversation.",
-        th: 'บอทสนทนาที่ตอบคำถามต่อเนื่องและรายละเอียดที่สคริปต์ทำไม่ได้ เหมาะกับธุรกิจที่มีข้อความเข้ามาจำนวนมากและอยากให้การตอบรู้สึกเหมือนคุยกับคนจริง'
-      }
+      en: "I'm Joule Kasima. Ten years in customer service taught me that people remember how you made them feel — so now I build ventures around that idea, like Thai Talk Breaks and Journey Planner.",
+      th: 'ฉันคือ Joule Kasima ประสบการณ์ 10 ปีในงานบริการลูกค้าสอนให้รู้ว่าผู้คนจดจำความรู้สึกที่ได้รับมากกว่าสิ่งอื่นใด ตอนนี้ฉันจึงสร้างโปรเจกต์ต่าง ๆ จากแนวคิดนั้น อย่าง Thai Talk Breaks และ Journey Planner'
     }
   },
 
