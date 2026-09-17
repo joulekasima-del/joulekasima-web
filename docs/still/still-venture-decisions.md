@@ -78,15 +78,13 @@ CTA behavior: all four "Book a session"/"[ book ]" buttons now point to `/book`,
 
 ---
 
-## 5. Pricing — decided
+## 5. Pricing — decided (updated)
 
-- **Single session:** ฿750
-- **5-session bundle:** ฿3,000 (฿600/session — saves ฿750 vs. buying five singles)
-- The bundle pays for **one session immediately** (the buyer picks a day/time as normal) **plus 4 credits** redeemable for future sessions without paying again.
-- Both options are shown **before** the participant picks a day/time, so they choose their slot already knowing what they're paying for — this is now built into the booking prototype (§6) as a plan-selector at the top of the details step.
-- This replaces the vague "ask about an intro rate" copy that was on the landing page's session-details panel; that row now shows the real bundle price instead. The landing page has been updated to match.
-
-**New open question this creates** (see §8): the bundle introduces a credits/redemption model that Kraft Junction's protocol doesn't have at all — it needs its own policy decisions before Claude Code builds it for real.
+- **฿750 per session, flat.** No volume discount, no separate "bundle price."
+- At checkout, the participant picks a **quantity** (1 or more) in one purchase — not a fixed package size. Total charged = quantity × ฿750.
+- The participant picks a day/time for **every session in the purchase**, right there in the same checkout, before paying — not just the first one. All N sessions come out of the purchase already scheduled.
+- The quantity picker is shown **before** day/time picking, same principle as before: the participant should know what they're paying for before choosing a slot.
+- **This replaces the earlier fixed "5-session bundle at ฿3,000."** Reasoning: the flat discountless rate means every session is worth exactly ฿750 regardless of how many were bought together, which removes an entire category of ambiguity — there's no separate "bundle price" to reconcile against cash refund tiers, and no special case for "what does the bundle's first session cost." Quantity replaces plan as the only purchase-time decision.
 
 ---
 
@@ -100,7 +98,7 @@ Source: `KRAFT_JUNCTION_BOOKING_SYSTEM_REPORT.md` (user-provided). Kraft Junctio
 - **Cancellation tiers**, exact wording:
   > "Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. If I have to cancel, you're always fully refunded."
 - **Pricing display pattern**: THB as source of truth, USD/EUR shown alongside
-- Resend-based email infrastructure, branded HTML wrapper, 24-hour-before reminder cron
+- Resend-based email infrastructure, branded HTML wrapper, reminder cron sent 24 hours and 15 minutes before each session
 - Booking reference format, adapted: `ST-XXXXXXXX` (8-char alphanumeric, mirrors Kraft Junction's `KJ-XXXXXXXX`)
 - Guest checkout only — no participant accounts
 
@@ -134,11 +132,14 @@ This replaces the earlier "static room" decision — reasoning: convenience for 
 
 This means `bookings` needs one more field beyond what's in the schema below: `calendar_sync_failed` (boolean, default false) alongside `calendar_event_id`, so Claude Code can build a simple "needs attention" view for these.
 
-### Bundle credits — decided
-The three questions the bundle (§5) raised are now settled:
-- **Expiry:** credits expire **6 months** from the bundle purchase date. `session_credits.expires_at` = `purchased_at` + 6 months, set at purchase time.
-- **Cancellation on a credit-redeemed session:** **24h+ notice → the credit returns** to the balance (`credits_used` decrements, so it's usable again); **under 24h → the credit is forfeited** (`credits_used` stays as-is). This mirrors the cash cancellation tiers' spirit but collapses to a single 24-hour line since a credit can't be partially refunded the way cash can — there's no 50%-of-a-credit.
-- **Redemption flow:** redeeming a credit goes through the **same details → day/time flow** as a fresh booking, just **skipping the payment step** (no card fields, no price block) since it's already paid for. Keeps the UX consistent rather than building a separate shortcut path — one flow to maintain instead of two.
+### Multi-session purchases — decided (updated, supersedes "credits" model)
+Buying more than one session at once no longer creates credits to redeem later. Instead: **every session in the purchase gets a day/time picked and confirmed in the same checkout, before payment.** Concretely:
+- After choosing a quantity (N), step 1 asks the participant to pick a day and time for **each of the N sessions**, one at a time, right there in the same flow — not just the first one. A running list shows what's been picked so far, with the option to redo any of them before continuing.
+- Payment happens once, for the full N × ฿750 total, same as before.
+- On confirmation, **all N sessions are created as real, independent bookings**, each getting its own Google Calendar event and Meet link (see below) — the participant walks away with every session already on their calendar, with nothing to come back and redeem.
+- This removes the entire credits system: **no `session_credits` table, no expiry, no redemption flow, no `credit_id`.** Every booking, whether it's session 1 of 1 or session 5 of 5, is the same kind of row — directly paid, directly scheduled.
+- **Cancellation is now uniform:** every session cancels under the same cash 48h/24h/none tiers, applied to ฿750 per session, refunded as a partial Stripe refund against the shared purchase charge. There's no separate "credit" rule anymore, since nothing is ever redeemed later.
+- Multiple bookings from one purchase share the same `stripe_payment_intent_id` (one charge covers all N), which is what ties them together as "the same purchase" — no separate grouping table needed.
 
 ### Homepage listing, CTA route, and booking window — decided
 - **Homepage:** Still gets added to the `#ventures` section now, status pill `[ live ]`. Suggested card, matching the pattern of the other venture cards (bordered box, serif title, short description, status pill, direct action button rather than a "learn more" link):
@@ -155,39 +156,37 @@ The three questions the bundle (§5) raised are now settled:
 - Multi-artisan `artisans` table — single hardcoded provider profile instead
 - Stripe Connect / marketplace payout logic
 
-### Simplified schema for Still (decision, not yet built)
+### Simplified schema for Still (updated)
 ```
-sessions        — 1 row: "1:1 guided meditation", 30 min, price_single_thb (750),
-                   price_bundle_thb (3000), max_participants = 1
+sessions        — 1 row: "1:1 guided meditation", 30 min, price_per_session_thb (750),
+                   max_participants = 1
 availability    — date, start_time, locked_until (15-min lock), booked (bool)
-bookings        — id, reference (ST-XXXXXXXX), plan (single/bundle), first_name,
-                   last_name, email, phone, notes, status (pending/confirmed/
-                   cancelled_by_participant/cancelled_by_provider),
-                   stripe_payment_intent_id, stripe_refund_id, refund_amount_thb,
+bookings        — id, reference (ST-XXXXXXXX), first_name, last_name, email, phone,
+                   notes, status (pending/confirmed/cancelled_by_participant/
+                   cancelled_by_provider), stripe_payment_intent_id (shared across
+                   every booking row created from the same purchase — this is
+                   what ties multi-session purchases together, not a separate
+                   grouping table), stripe_refund_id, refund_amount_thb,
                    reminder_sent, newsletter_opt_in, call_link (set per booking by
                    the Calendar API response), calendar_event_id (Google Calendar
                    event ID — needed to update/delete the event on cancellation),
                    calendar_sync_failed (boolean, default false — set true if the
                    Calendar API call failed and a backup link was used instead),
-                   credit_id (FK → session_credits, nullable — set when a bundle
-                   credit is redeemed rather than paid for directly), created_at,
-                   updated_at
-session_credits — id, email, total_credits (5), credits_used, purchased_at,
-                   stripe_payment_intent_id, expires_at (purchased_at + 6 months)
+                   created_at, updated_at
 email_subscribers — newsletter opt-ins captured on confirmation
 ```
-No `payouts`, no `artisans`, no `workshops` (folded into a single `sessions` row).
+No `payouts`, no `artisans`, no `workshops` (folded into a single `sessions` row), no `plan` field, no `session_credits` table, no `credit_id` (all superseded — see the decision above: every session is booked and paid for directly, in the same checkout, so there's nothing left to track separately as a credit).
 
 ---
 
 ## 7. Deliverable 2 — clickable booking prototype
 
-File: `still-booking-prototype.html` (front-end only, no real backend — published as a Claude artifact during this session). Demonstrates the full protocol above in an interactive, no-code-required way:
+File: `still-booking-prototype.html` (front-end only, no real backend — published as a Claude artifact during this session). **Updated for the "schedule everything now" model** — demonstrates the full protocol above in an interactive, no-code-required way:
 
-- Step 1: **plan selector first** (single ฿750 vs. 5-session bundle ฿3,000, shown before day/time so the participant picks their slot already knowing what they're paying for — per the pricing decision in §5), then name/email/phone, a **full month calendar** (prev/next navigation, past dates greyed, dates beyond the open booking window greyed as "not yet open," available dates marked with a dot) for picking the day, a time grid below it once a day's selected (some slots pre-marked taken/past to simulate real availability), optional context notes
-- Step 2: live 15-minute hold countdown, THB/USD price block that reflects the chosen plan, styled (non-functional) card fields, full cancellation text, unchecked-by-default newsletter opt-in
-- Step 3: generated `ST-XXXXXXXX` reference, mock call-link reveal, plan-aware confirmation (shows "4 of 5 sessions remaining" for bundle bookings), interactive cancellation-tier simulator (60h / 30h / 10h scenarios)
-- A toggleable **system log** drawer narrates each backend event as it would fire (plan selection, slot lock, payment intent, status transitions, `session_credits` row creation for bundles, which emails send, reminder cron) — built as a protocol walkthrough as much as a UI demo
+- Step 1: **quantity selector first** (how many sessions to buy, ฿750 each, live-updating total, per §5), then name/email/phone, then a **repeating day/time picker** — the same full month calendar (30-day window, prev/next navigation) used once per session in the quantity, with a running list showing what's been picked so far and letting the participant redo any of them, until all N are scheduled
+- Step 2: live 15-minute hold countdown covering all N reserved slots, THB/USD price block (quantity × ฿750), a summary listing every session's date/time, styled (non-functional) card fields, full cancellation text, unchecked-by-default newsletter opt-in
+- Step 3: a generated `ST-XXXXXXXX` reference and its own mock call-link for **each** of the N sessions — nothing left to redeem later — plus a cancellation simulator (uniform cash tiers, since every session is directly paid and directly scheduled now)
+- A toggleable **system log** drawer narrates each backend event as it would fire (quantity and slot selection, multi-slot hold, payment intent, N calendar events being created, which emails send, reminder cron) — built as a protocol walkthrough as much as a UI demo
 
 This prototype has **no real Stripe, Supabase, or Resend calls** — it's a state machine in vanilla JS for review purposes only. Nothing here is production code.
 
@@ -197,10 +196,10 @@ This prototype has **no real Stripe, Supabase, or Resend calls** — it's a stat
 
 **None remaining.** Every question raised across this session is now settled:
 
-- Pricing (§5 — ฿750 single / ฿3,000 bundle)
+- Pricing (§5 — ฿750/session flat, quantity-based purchase, no bundle)
 - Locale routing (§6 — English-only, flat routes)
 - Call link method and its failure fallback (§6 — auto-generated via Google Calendar, retry → backup link → manual flag)
-- All three bundle-credit questions (§6 — 6-month expiry, 24h cancellation line, same-flow redemption)
+- Multi-session purchases (§6 — every session scheduled and paid for in one checkout, no credits, uniform cancellation tiers)
 - Homepage listing, CTA route, and booking window (§6 — `[ live ]` on the homepage, `/book` as the route, 30-day window)
 
 This doc, the landing page, and the prototype are all in sync with these decisions and ready to hand to Claude Code as-is.
@@ -211,8 +210,8 @@ This doc, the landing page, and the prototype are all in sync with these decisio
 
 | File | Purpose |
 |---|---|
-| `still-meditation-page.html` | Final landing page design, matched to joulekasima.com's actual design system, real pricing shown |
-| `still-booking-prototype.html` | Clickable, front-end-only prototype of the booking flow, plan selector, and protocol |
+| `still-meditation-page.html` | Final landing page design, matched to joulekasima.com's actual design system, real flat pricing shown |
+| `still-booking-prototype.html` | Clickable, front-end-only prototype of the booking flow, quantity selector, and protocol |
 | `still-venture-decisions.md` | This document |
 
-None of these are wired to a live backend. Claude Code's job from here: stand up the Supabase schema in §6 (including `session_credits` with its 6-month expiry, and `calendar_event_id`/`calendar_sync_failed` on `bookings`), build the real `/book` route following the prototype's UX in §7 and the credit-redemption behavior decided in §6, wire Stripe against the decided prices in §5, wire the Google Calendar API for call-link generation with the retry/fallback logic already decided in §6, wire Resend for the email set, add the Still card to the homepage's `#ventures` section per §6, and confirm the landing page's CTAs (already pointing at `/book`) resolve correctly once that route exists. No open decisions are blocking any of this.
+None of these are wired to a live backend. Claude Code's job from here: stand up the Supabase schema in §6 (no `session_credits`, no `credit_id`, no `plan` — just `sessions`, `availability`, `bookings` with `calendar_event_id`/`calendar_sync_failed`, and `email_subscribers`), build the real `/book` route following the prototype's UX in §7, where a purchase of N sessions gets all N scheduled in one checkout, wire Stripe against the flat ฿750 price in §5 with a single charge covering the full purchase, wire the Google Calendar API to create one event per session with the retry/fallback logic already decided in §6, wire Resend for the email set, add the Still card to the homepage's `#ventures` section per §6, and confirm the landing page's CTAs (already pointing at `/book`) resolve correctly once that route exists. No open decisions are blocking any of this.
