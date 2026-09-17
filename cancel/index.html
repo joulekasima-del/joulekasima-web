@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage booking — Still | Joule Kasima</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="https://www.joulekasima.com" class="wordmark">Joule Kasima<span class="venture-tag">still</span></a>
+  </div>
+</header>
+
+<main class="book-main">
+  <div class="book-wrap" style="max-width: 520px;">
+
+    <div id="loading">
+      <h1 class="page-title">Manage booking</h1>
+      <p class="page-sub">Looking up your booking…</p>
+    </div>
+
+    <div id="not-found" hidden>
+      <h1 class="page-title">Booking not found</h1>
+      <p class="page-sub">This cancellation link is invalid or has expired. If you need help, email <a href="mailto:hello@joulekasima.com" style="color:var(--accent);">hello@joulekasima.com</a>.</p>
+    </div>
+
+    <div id="details" hidden>
+      <h1 class="page-title" id="d-title">Cancel your session?</h1>
+      <p class="page-sub" id="d-sub">—</p>
+
+      <div class="book-panel">
+        <div class="summary-row"><span class="label">reference</span><span class="value" id="d-ref">—</span></div>
+        <div class="summary-row"><span class="label">when</span><span class="value" id="d-when">—</span></div>
+        <div class="summary-row"><span class="label">status</span><span class="value" id="d-status">—</span></div>
+      </div>
+
+      <div class="banner banner-warn" id="d-preview">—</div>
+
+      <div class="policy-box" id="d-policy">
+        Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. Any other sessions from the same purchase are untouched.
+      </div>
+
+      <div class="action-row" id="d-actions" style="justify-content: flex-start; gap: 14px;">
+        <button class="book-btn" id="confirm-cancel">Cancel this booking</button>
+        <a class="book-btn-text" href="https://www.joulekasima.com/still">never mind, keep it</a>
+      </div>
+
+      <p class="field-error" id="d-error" hidden></p>
+    </div>
+
+    <div id="done" hidden>
+      <h1 class="page-title">Cancelled</h1>
+      <p class="page-sub" id="done-text">—</p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  const token = params.get('token');
+
+  function show(id) {
+    ['loading', 'not-found', 'details', 'done'].forEach((x) => { $(x).hidden = x !== id; });
+  }
+
+  function fmtWhen(date, startTime) {
+    const d = new Date(`${date}T${startTime}`);
+    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) +
+      ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' (Chiang Mai)';
+  }
+
+  if (!ref || !token) {
+    show('not-found');
+    return;
+  }
+
+  fetch(`/api/still/booking-lookup?ref=${encodeURIComponent(ref)}&token=${encodeURIComponent(token)}`)
+    .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) { show('not-found'); return; }
+
+      $('d-ref').textContent = data.reference;
+      $('d-when').textContent = fmtWhen(data.date, data.start_time);
+      $('d-status').textContent = data.status;
+      $('d-sub').textContent = `Hi ${data.first_name} — here's what cancelling now would mean.`;
+      $('d-preview').textContent = data.preview.text;
+
+      if (!data.preview.actionable) {
+        $('d-actions').hidden = true;
+      }
+
+      show('details');
+
+      $('confirm-cancel').addEventListener('click', async () => {
+        const btn = $('confirm-cancel');
+        btn.disabled = true;
+        btn.textContent = 'Cancelling…';
+        $('d-error').hidden = true;
+        try {
+          const res = await fetch('/api/still/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reference: ref, token }),
+          });
+          const result = await res.json();
+          if (!res.ok) throw new Error(result.error || 'Could not cancel this booking.');
+
+          const text = result.refund_thb > 0
+            ? `Your booking is cancelled. ฿${result.refund_thb} is being refunded to your card. Any other sessions from the same purchase are untouched.`
+            : 'Your booking is cancelled. Since it was under 24 hours notice, no refund applies. Any other sessions from the same purchase are untouched.';
+          $('done-text').textContent = text;
+          show('done');
+        } catch (err) {
+          $('d-error').hidden = false;
+          $('d-error').textContent = err.message;
+          btn.disabled = false;
+          btn.textContent = 'Cancel this booking';
+        }
+      });
+    })
+    .catch(() => show('not-found'));
+})();
+</script>
+</body>
+</html>
