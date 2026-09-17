@@ -1,0 +1,29 @@
+name: Still — reminder cron
+
+# Vercel Hobby's cron only runs once a day, which isn't tight enough to
+# catch the 15-minute-before-session reminder window. This workflow calls
+# the reminder API route every 5 minutes instead — no new account needed,
+# the repo's already on GitHub.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  call-reminder-endpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/still/cron-reminder
+        env:
+          CRON_SECRET: ${{ secrets.STILL_CRON_SECRET }}
+          SITE_URL: ${{ vars.STILL_SITE_URL || 'https://www.joulekasima.com' }}
+        run: |
+          status=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X GET "$SITE_URL/api/still/cron-reminder" \
+            -H "Authorization: Bearer $CRON_SECRET")
+          echo "HTTP status: $status"
+          cat /tmp/response.json
+          if [ "$status" -ge 300 ]; then
+            echo "Reminder cron call failed."
+            exit 1
+          fi
