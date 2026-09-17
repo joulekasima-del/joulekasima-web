@@ -132,6 +132,17 @@ This replaces the earlier "static room" decision — reasoning: convenience for 
 
 This means `bookings` needs one more field beyond what's in the schema below: `calendar_sync_failed` (boolean, default false) alongside `calendar_event_id`, so Claude Code can build a simple "needs attention" view for these.
 
+### Reminder scheduling infrastructure — decided
+The site is hosted on **Vercel Hobby**, which only permits cron jobs to run once per day, and even that one run isn't guaranteed to fire at a precise time (±59 min window) — incompatible with a reminder that needs to fire at a specific 24h15m-before mark per session, checked every few minutes.
+
+**Decision: stay on Vercel Hobby (don't upgrade to Pro), and use an external scheduler instead of Vercel's own cron.** Specifically:
+- **GitHub Actions**, using its `schedule` trigger (e.g. every 5 minutes), calling the existing reminder API route with a `curl` request carrying a secret bearer token. This needs no new third-party account or signup — the repo already lives on GitHub — and costs nothing at this volume.
+- Remove the `crons` entry from `vercel.json` entirely — it would fail to deploy on Hobby regardless, since the schedule needed (every few minutes) exceeds the once-daily limit.
+- The reminder route itself doesn't change — it still checks the same 24h/15m windows against `bookings`. Only *what triggers it* changes, from Vercel's own cron to a GitHub Actions workflow hitting the route on a schedule.
+- The route must be **secured** (a secret header/bearer token checked before doing anything), since it's now reachable by anyone who finds the URL, not just Vercel's internal cron dispatcher.
+
+If GitHub Actions ever becomes inconvenient, a dedicated free external cron service (cron-job.org or similar) is a drop-in alternative — same pattern, different trigger source.
+
 ### Multi-session purchases — decided (updated, supersedes "credits" model)
 Buying more than one session at once no longer creates credits to redeem later. Instead: **every session in the purchase gets a day/time picked and confirmed in the same checkout, before payment.** Concretely:
 - After choosing a quantity (N), step 1 asks the participant to pick a day and time for **each of the N sessions**, one at a time, right there in the same flow — not just the first one. A running list shows what's been picked so far, with the option to redo any of them before continuing.
@@ -199,6 +210,7 @@ This prototype has **no real Stripe, Supabase, or Resend calls** — it's a stat
 - Pricing (§5 — ฿750/session flat, quantity-based purchase, no bundle)
 - Locale routing (§6 — English-only, flat routes)
 - Call link method and its failure fallback (§6 — auto-generated via Google Calendar, retry → backup link → manual flag)
+- Reminder scheduling infrastructure (§6 — stay on Vercel Hobby, trigger reminders via a GitHub Actions scheduled workflow instead of Vercel's own cron)
 - Multi-session purchases (§6 — every session scheduled and paid for in one checkout, no credits, uniform cancellation tiers)
 - Homepage listing, CTA route, and booking window (§6 — `[ live ]` on the homepage, `/book` as the route, 30-day window)
 
