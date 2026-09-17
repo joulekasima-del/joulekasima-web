@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a session — Still | Joule Kasima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --bg-panel: #F1EEE6;
+    --white: #FFFFFF;
+    --ink: #13161C;
+    --ink-soft: #5B6069;
+    --ink-faint: #8B909A;
+    --line: #DFDCD4;
+    --accent: #8A5F24;
+    --accent-bg: #EFE3CD;
+    --accent-line: #D9C6A0;
+    --good: #3F6B4F;
+    --good-bg: #E4EEE6;
+    --warn: #A34324;
+    --warn-bg: #F5E4DC;
+
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, 'system-ui', sans-serif;
+    --mono: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121417; --bg-panel: #191C20; --white: #1B1E22;
+      --ink: #F2F1EC; --ink-soft: #A9ADB4; --ink-faint: #6C7178;
+      --line: #2A2D32; --accent: #D2A45C; --accent-bg: #2A2114; --accent-line: #4A3A22;
+      --good: #7FB491; --good-bg: #16211A; --warn: #E08A66; --warn-bg: #241713;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121417; --bg-panel: #191C20; --white: #1B1E22;
+    --ink: #F2F1EC; --ink-soft: #A9ADB4; --ink-faint: #6C7178;
+    --line: #2A2D32; --accent: #D2A45C; --accent-bg: #2A2114; --accent-line: #4A3A22;
+    --good: #7FB491; --good-bg: #16211A; --warn: #E08A66; --warn-bg: #241713;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  button { font-family: inherit; }
+  ::selection { background: var(--accent-bg); color: var(--accent); }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Header ---------- */
+  header.site {
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .site-inner {
+    max-width: 640px; margin: 0 auto; padding: 0 24px;
+    height: 64px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .wordmark {
+    font-family: var(--serif); font-weight: 600; font-size: 18px;
+    text-decoration: none; color: var(--ink);
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .wordmark .venture-tag {
+    font-family: var(--mono); font-size: 11.5px; font-weight: 400;
+    color: var(--accent); background: var(--accent-bg);
+    border: 1px solid var(--accent-line); border-radius: 2px; padding: 2px 7px;
+  }
+  .bracket-link {
+    font-family: var(--mono); font-size: 13.5px; color: var(--ink-faint);
+    text-decoration: none;
+  }
+  .bracket-link:hover { color: var(--ink-soft); }
+
+  /* ---------- Stepper ---------- */
+  .stepper {
+    display: flex; gap: 6px; padding: 28px 0 0;
+    font-family: var(--mono); font-size: 12.5px;
+  }
+  .stepper .step-pill {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--ink-faint); padding: 5px 0;
+    border-bottom: 2px solid var(--line);
+    flex: 1; justify-content: center;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .stepper .step-pill .n {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 1px solid var(--ink-faint);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .stepper .step-pill.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .stepper .step-pill.active .n { border-color: var(--accent); color: var(--accent); }
+  .stepper .step-pill.done { color: var(--ink-soft); border-bottom-color: var(--good); }
+  .stepper .step-pill.done .n { border-color: var(--good); background: var(--good); color: var(--white); }
+
+  main { padding: 40px 0 90px; }
+  .panel-step { display: none; }
+  .panel-step.visible { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  h1.page-title {
+    font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 6vw, 38px);
+    margin: 0 0 10px; letter-spacing: -0.01em;
+  }
+  p.page-sub { color: var(--ink-soft); font-size: 16px; margin: 0 0 34px; max-width: 50ch; }
+
+  h2.block-title {
+    font-family: var(--sans); font-weight: 600; font-size: 14px;
+    text-transform: none; color: var(--ink-faint); letter-spacing: 0.01em;
+    margin: 0 0 14px;
+    font-family: var(--mono);
+  }
+
+  /* ---------- Form elements ---------- */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px;
+  }
+  .field input, .field textarea {
+    width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink);
+    background: var(--white); border: 1px solid var(--line); border-radius: 3px;
+    padding: 11px 13px; outline: none;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 74px; }
+  .field .optional-tag { color: var(--ink-faint); font-weight: 400; }
+
+  /* ---------- Plan selector ---------- */
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+  .plan-card {
+    position: relative; text-align: left; cursor: pointer;
+    background: var(--white); border: 1px solid var(--line); border-radius: 3px;
+    padding: 18px 18px 16px;
+  }
+  .plan-card:hover { border-color: var(--ink-faint); }
+  .plan-card.selected { border-color: var(--accent); background: var(--accent-bg); }
+  .plan-card .save-tag {
+    position: absolute; top: -9px; right: 12px;
+    font-family: var(--mono); font-size: 10.5px; color: var(--bg);
+    background: var(--accent); border-radius: 2px; padding: 2px 7px;
+  }
+  .plan-card .p-name { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); margin-bottom: 8px; }
+  .plan-card.selected .p-name { color: var(--accent); }
+  .plan-card .p-price { font-family: var(--serif); font-size: 24px; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+  .plan-card .p-sub { font-size: 13px; color: var(--ink-soft); }
+
+  /* ---------- Calendar ---------- */
+  .calendar {
+    border: 1px solid var(--line); border-radius: 3px; background: var(--white);
+    padding: 18px 18px 14px; margin-bottom: 22px;
+  }
+  .cal-head {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+  }
+  .cal-month {
+    font-family: var(--serif); font-size: 17px; color: var(--ink);
+  }
+  .cal-nav {
+    font-family: var(--mono); font-size: 14px; color: var(--ink-soft);
+    background: none; border: 1px solid var(--line); border-radius: 3px;
+    width: 30px; height: 30px; cursor: pointer;
+  }
+  .cal-nav:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .cal-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .cal-nav:disabled:hover { border-color: var(--line); color: var(--ink-soft); }
+
+  .cal-dow-row, .cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  }
+  .cal-dow-row {
+    margin-bottom: 6px;
+  }
+  .cal-dow-row div {
+    font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint);
+    text-align: center; padding-bottom: 4px;
+  }
+  .cal-cell {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-size: 13.5px; border-radius: 3px;
+    position: relative;
+  }
+  .cal-cell.empty { visibility: hidden; }
+  .cal-cell.past { color: var(--ink-faint); opacity: 0.35; }
+  .cal-cell.closed { color: var(--ink-faint); opacity: 0.5; }
+  .cal-cell.available {
+    color: var(--ink); background: var(--bg-panel); cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .cal-cell.available:hover { border-color: var(--accent-line); }
+  .cal-cell.available::after {
+    content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+    width: 3px; height: 3px; border-radius: 50%; background: var(--accent); opacity: 0.6;
+  }
+  .cal-cell.selected {
+    background: var(--accent); color: var(--bg); font-weight: 600;
+  }
+  .cal-cell.selected::after { background: var(--bg); }
+  .cal-cell.today:not(.selected) { box-shadow: inset 0 0 0 1px var(--accent-line); }
+  .cal-legend {
+    display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+  }
+  .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .cal-legend .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.6; }
+
+  .time-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 22px;
+  }
+  .time-chip {
+    font-family: var(--mono); font-size: 13.5px;
+    background: var(--white); border: 1px solid var(--line); border-radius: 3px;
+    padding: 11px 8px; cursor: pointer; text-align: center; color: var(--ink);
+  }
+  .time-chip:hover { border-color: var(--ink-faint); }
+  .time-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+  .time-chip.taken { color: var(--ink-faint); text-decoration: line-through; cursor: not-allowed; background: var(--bg-panel); }
+
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 14.5px; font-weight: 500;
+    color: var(--bg); background: var(--ink); border: 1px solid var(--ink);
+    border-radius: 3px; padding: 13px 22px; text-decoration: none; cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover { background: transparent; color: var(--ink); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn:disabled:hover { background: var(--ink); color: var(--bg); }
+  .btn .chevron { color: var(--ink-faint); }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 14.5px; font-weight: 500;
+    color: var(--ink); background: transparent; border: 1px solid var(--ink);
+    border-radius: 3px; padding: 12px 21px; text-decoration: none; cursor: pointer;
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--bg); }
+
+  .btn-text {
+    font-family: var(--mono); font-size: 13.5px; color: var(--ink-faint);
+    background: none; border: none; cursor: pointer; padding: 8px 0;
+  }
+  .btn-text:hover { color: var(--ink-soft); }
+
+  .action-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 28px; }
+
+  /* ---------- Summary / panels ---------- */
+  .panel {
+    background: var(--bg-panel); border: 1px solid var(--line); border-radius: 3px;
+    padding: 22px 24px; margin-bottom: 24px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0; gap: 16px;
+  }
+  .summary-row + .summary-row { border-top: 1px solid var(--line); }
+  .summary-row .label { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); }
+  .summary-row .value { font-size: 14.5px; color: var(--ink); text-align: right; font-weight: 500; }
+
+  .hold-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--accent);
+    background: var(--accent-bg); border: 1px solid var(--accent-line);
+    border-radius: 2px; padding: 6px 11px; margin-bottom: 22px;
+  }
+  .hold-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1.4s ease infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  .hold-badge.expired { color: var(--warn); background: var(--warn-bg); border-color: var(--warn); }
+  .hold-badge.expired .dot { background: var(--warn); animation: none; }
+
+  .price-block {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border: 1px solid var(--line); border-radius: 3px; padding: 20px 24px; margin-bottom: 24px;
+    background: var(--white);
+  }
+  .price-block .thb { font-family: var(--serif); font-size: 26px; color: var(--ink); }
+  .price-block .usd { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
+  .price-block .ptag {
+    font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+    border: 1px solid var(--line); border-radius: 2px; padding: 3px 8px; height: fit-content;
+  }
+
+  .card-fields { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 8px; }
+  .card-fields .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .policy-box {
+    border-left: 2px solid var(--accent-line); padding: 4px 0 4px 16px; margin: 20px 0 8px;
+    font-size: 14px; color: var(--ink-soft); font-style: italic; font-family: var(--serif);
+  }
+
+  .checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin: 18px 0 6px; }
+  .checkbox-row input { margin-top: 3px; }
+  .checkbox-row label { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ---------- Confirmation ---------- */
+  .confirm-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 13px; color: var(--good);
+    background: var(--good-bg); border-radius: 2px; padding: 7px 12px; margin-bottom: 20px;
+  }
+  .ref-block {
+    font-family: var(--mono); font-size: 13px; color: var(--ink-faint); margin-bottom: 6px;
+  }
+  .ref-block .ref { color: var(--ink); font-size: 15px; letter-spacing: 0.03em; }
+
+  .call-link-box {
+    border: 1px dashed var(--accent-line); background: var(--accent-bg);
+    border-radius: 3px; padding: 16px 18px; margin: 20px 0 26px;
+  }
+  .call-link-box .k { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 6px; }
+  .call-link-box .v { font-family: var(--mono); font-size: 14px; color: var(--ink); word-break: break-all; }
+
+  .cancel-sim {
+    border-top: 1px solid var(--line); margin-top: 32px; padding-top: 24px;
+  }
+  .tier-btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 16px; }
+  .tier-btn {
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft);
+    background: var(--white); border: 1px solid var(--line); border-radius: 3px;
+    padding: 8px 13px; cursor: pointer;
+  }
+  .tier-btn:hover { border-color: var(--ink-faint); }
+  .tier-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+  .tier-result {
+    font-size: 14.5px; padding: 14px 16px; border-radius: 3px; display: none;
+  }
+  .tier-result.show { display: block; }
+  .tier-result.full { background: var(--good-bg); color: var(--good); }
+  .tier-result.half { background: var(--accent-bg); color: var(--accent); }
+  .tier-result.none { background: var(--warn-bg); color: var(--warn); }
+
+  /* ---------- System log drawer ---------- */
+  .log-toggle {
+    position: fixed; bottom: 20px; right: 20px; z-index: 30;
+    font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft);
+    background: var(--white); border: 1px solid var(--line); border-radius: 20px;
+    padding: 9px 16px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .log-toggle .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .log-drawer {
+    position: fixed; bottom: 0; right: 0; left: 0; z-index: 29;
+    max-height: 0; overflow: hidden; background: var(--ink); color: #C9CDD3;
+    transition: max-height 0.25s ease;
+    border-top: 1px solid var(--line);
+  }
+  .log-drawer.open { max-height: 46vh; }
+  .log-drawer-inner { max-width: 900px; margin: 0 auto; padding: 16px 24px 20px; }
+  .log-drawer-head {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 12px; color: #8B909A; margin-bottom: 10px;
+  }
+  .log-lines { font-family: var(--mono); font-size: 12.5px; line-height: 1.9; max-height: 34vh; overflow-y: auto; }
+  .log-lines .l-time { color: #6C7178; margin-right: 10px; }
+  .log-lines .l-new { animation: flashIn 0.6s ease; }
+  @keyframes flashIn { from { background: rgba(210,164,92,0.18); } to { background: transparent; } }
+
+  footer.site-footer {
+    padding: 20px 0 100px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint);
+    text-align: center;
+  }
+
+  @media (max-width: 560px) {
+    .wrap, .site-inner { padding: 0 18px; }
+    .field-row { grid-template-columns: 1fr; gap: 0; }
+    .time-grid { grid-template-columns: repeat(2, 1fr); }
+    .stepper .step-pill span.label-text { display: none; }
+    .card-fields .row2 { grid-template-columns: 1fr 1fr; }
+    .price-block { flex-direction: column; gap: 10px; align-items: flex-start; }
+    .cal-cell { font-size: 12px; }
+    .calendar { padding: 14px 12px 10px; }
+    .plan-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="site">
+    <div class="site-inner">
+      <a class="wordmark" href="#"><span aria-hidden="true">Joule Kasima</span> <span class="venture-tag">still</span></a>
+      <a class="bracket-link" href="#">[ back to still ]</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <div class="stepper">
+        <div class="step-pill active" id="pill-1"><span class="n">1</span><span class="label-text">&nbsp;details</span></div>
+        <div class="step-pill" id="pill-2"><span class="n">2</span><span class="label-text">&nbsp;payment</span></div>
+        <div class="step-pill" id="pill-3"><span class="n">3</span><span class="label-text">&nbsp;confirmed</span></div>
+      </div>
+
+      <!-- STEP 1 — DETAILS -->
+      <section class="panel-step visible" id="step-1">
+        <h1 class="page-title">Book a session</h1>
+        <p class="page-sub">30 minutes, 1:1, over a call. Pick a time and tell me a little about you — the practice gets built around what you share.</p>
+
+        <h2 class="block-title">&gt; choose how you want to book</h2>
+        <div class="plan-grid">
+          <div class="plan-card" id="plan-single" data-plan="single" data-thb="750">
+            <div class="p-name">single session</div>
+            <div class="p-price">฿750</div>
+            <div class="p-sub">One 30-minute session, booked now.</div>
+          </div>
+          <div class="plan-card" id="plan-bundle" data-plan="bundle" data-thb="3000">
+            <span class="save-tag">SAVE ฿750</span>
+            <div class="p-name">5-session bundle</div>
+            <div class="p-price">฿3,000</div>
+            <div class="p-sub">฿600 per session. Book this one now, use the other 4 whenever.</div>
+          </div>
+        </div>
+
+        <h2 class="block-title">&gt; your details</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="fname">First name</label>
+            <input type="text" id="fname" placeholder="Jamie">
+          </div>
+          <div class="field">
+            <label for="lname">Last name</label>
+            <input type="text" id="lname" placeholder="Rivera">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="jamie@example.com">
+          </div>
+          <div class="field">
+            <label for="phone">Phone <span class="optional-tag">(optional)</span></label>
+            <input type="tel" id="phone" placeholder="+66 8x xxx xxxx">
+          </div>
+        </div>
+
+        <h2 class="block-title" style="margin-top: 28px;">&gt; choose a day <span style="color:var(--ink-faint); font-weight:400;">— for this first session</span></h2>
+        <div class="calendar" id="calendar">
+          <div class="cal-head">
+            <button class="cal-nav" id="cal-prev" type="button" aria-label="Previous month">&lt;</button>
+            <span class="cal-month" id="cal-month-label">—</span>
+            <button class="cal-nav" id="cal-next" type="button" aria-label="Next month">&gt;</button>
+          </div>
+          <div class="cal-dow-row" id="cal-dow-row"></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-legend"><span><span class="dot"></span> open for booking</span><span style="opacity:0.5;">greyed = past or not yet open</span></div>
+        </div>
+
+        <h2 class="block-title">&gt; choose a time <span style="color:var(--ink-faint); font-weight:400;">(Chiang Mai time, GMT+7)</span></h2>
+        <div class="time-grid" id="time-grid"></div>
+
+        <div class="field">
+          <label for="notes">Anything I should know before we start? <span class="optional-tag">(optional)</span></label>
+          <textarea id="notes" placeholder="A launch this week, a mind that won't stop, or nothing in particular — whatever's true."></textarea>
+        </div>
+
+        <div class="action-row" style="justify-content: flex-end;">
+          <button class="btn" id="to-payment" disabled><span class="chevron">&gt;</span> Hold my spot</button>
+        </div>
+      </section>
+
+      <!-- STEP 2 — PAYMENT -->
+      <section class="panel-step" id="step-2">
+        <h1 class="page-title">Confirm &amp; pay</h1>
+        <p class="page-sub">Your slot is held while you finish this step.</p>
+
+        <div class="hold-badge" id="hold-badge">
+          <span class="dot"></span> <span id="hold-text">Slot held — 15:00 remaining</span>
+        </div>
+
+        <div class="panel">
+          <div class="summary-row"><span class="label">plan</span><span class="value" id="summary-plan">—</span></div>
+          <div class="summary-row"><span class="label">session</span><span class="value">Still — 1:1 guided meditation</span></div>
+          <div class="summary-row"><span class="label">when</span><span class="value" id="summary-when">—</span></div>
+          <div class="summary-row"><span class="label">duration</span><span class="value">30 minutes</span></div>
+          <div class="summary-row"><span class="label">format</span><span class="value">Live, over a call</span></div>
+          <div class="summary-row"><span class="label">booking for</span><span class="value" id="summary-name">—</span></div>
+        </div>
+
+        <h2 class="block-title">&gt; price</h2>
+        <div class="price-block">
+          <div>
+            <div class="thb" id="price-thb">฿750</div>
+            <div class="usd" id="price-usd">≈ $23 USD / €21 EUR — charged in THB</div>
+          </div>
+          <div class="ptag" id="price-tag">single session</div>
+        </div>
+
+        <h2 class="block-title">&gt; payment</h2>
+        <div class="card-fields">
+          <div class="field">
+            <label for="cardnum">Card number</label>
+            <input type="text" id="cardnum" placeholder="4242 4242 4242 4242" maxlength="19">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="cardexp">Expiry</label>
+              <input type="text" id="cardexp" placeholder="MM / YY" maxlength="7">
+            </div>
+            <div class="field">
+              <label for="cardcvc">CVC</label>
+              <input type="text" id="cardcvc" placeholder="123" maxlength="4">
+            </div>
+          </div>
+        </div>
+        <p style="font-size: 12.5px; color: var(--ink-faint); margin-top: -6px;">This is a prototype — no card is charged, no real payment processor is called.</p>
+
+        <div class="policy-box">
+          Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. If I have to cancel, you're always fully refunded.
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="newsletter">
+          <label for="newsletter">Join the Still mailing list for quiet, occasional notes. Unchecked by default.</label>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-text" id="back-to-details">&larr; back, release this hold</button>
+          <button class="btn" id="to-confirm"><span class="chevron">&gt;</span> Pay &amp; confirm</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 — CONFIRMATION -->
+      <section class="panel-step" id="step-3">
+        <div class="confirm-badge">&#10003; Booking confirmed</div>
+        <h1 class="page-title">You're set.</h1>
+        <p class="page-sub" id="confirm-sub">A confirmation just went to your email.</p>
+
+        <div class="ref-block">booking reference — <span class="ref" id="ref-num">ST-00000000</span></div>
+
+        <div class="panel">
+          <div class="summary-row"><span class="label">plan</span><span class="value" id="confirm-plan">—</span></div>
+          <div class="summary-row"><span class="label">session</span><span class="value">Still — 1:1 guided meditation</span></div>
+          <div class="summary-row"><span class="label">when</span><span class="value" id="confirm-when">—</span></div>
+          <div class="summary-row"><span class="label">duration</span><span class="value">30 minutes</span></div>
+          <div class="summary-row"><span class="label">booked for</span><span class="value" id="confirm-name">—</span></div>
+          <div class="summary-row"><span class="label">paid</span><span class="value" id="confirm-paid">฿750</span></div>
+        </div>
+        <div class="panel" id="credits-panel" style="display:none;">
+          <div class="summary-row"><span class="label">sessions remaining</span><span class="value">4 of 5</span></div>
+          <div class="summary-row"><span class="label">credits tied to</span><span class="value" id="credits-email">—</span></div>
+        </div>
+
+        <div class="call-link-box">
+          <div class="k">&gt; your call link (auto-generated via Google Calendar — also added to your and my calendars)</div>
+          <div class="v" id="call-link">meet.google.com/xxx-xxxx-xxx</div>
+        </div>
+
+        <p style="font-size: 14px; color: var(--ink-soft);">A reminder goes out 24 hours before the session. Nothing else to prepare.</p>
+
+        <div class="cancel-sim">
+          <h2 class="block-title">&gt; try the cancellation policy</h2>
+          <p style="font-size: 13.5px; color: var(--ink-soft); margin: 0 0 4px;">See what a cancellation would look like, depending on when you cancel.</p>
+          <div class="tier-btns">
+            <button class="tier-btn" data-hours="60">Cancel 60h before</button>
+            <button class="tier-btn" data-hours="30">Cancel 30h before</button>
+            <button class="tier-btn" data-hours="10">Cancel 10h before</button>
+          </div>
+          <div class="tier-result" id="tier-result"></div>
+        </div>
+
+        <div class="action-row" style="justify-content: flex-start; margin-top: 36px;">
+          <button class="btn-outline" id="book-another"><span class="chevron">&gt;</span> Book another session</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">Prototype only — no real bookings, payments, or emails are made.</footer>
+
+  <button class="log-toggle" id="log-toggle"><span class="dot"></span> system log</button>
+  <div class="log-drawer" id="log-drawer">
+    <div class="log-drawer-inner">
+      <div class="log-drawer-head">
+        <span>BEHIND THE SCENES — what the Kraft Junction–style protocol would be doing right now</span>
+        <span id="log-close" style="cursor:pointer;">[ close ]</span>
+      </div>
+      <div class="log-lines" id="log-lines"></div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  // ---------- State ----------
+  const state = {
+    step: 1,
+    selectedPlan: null,
+    selectedDay: null,
+    selectedDayIndex: null,
+    selectedTime: null,
+    holdInterval: null,
+    holdSecondsLeft: 15 * 60,
+    holdExpired: false,
+    booked: false,
+    bookingRef: null,
+    fname: '', lname: '', email: ''
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Logging ----------
+  function log(msg) {
+    const el = $('log-lines');
+    const time = new Date().toLocaleTimeString('en-GB');
+    const line = document.createElement('div');
+    line.className = 'l-new';
+    line.innerHTML = '<span class="l-time">' + time + '</span>' + msg;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  $('log-toggle').addEventListener('click', () => $('log-drawer').classList.toggle('open'));
+  $('log-close').addEventListener('click', () => $('log-drawer').classList.remove('open'));
+
+  log('page loaded — pricing: ฿750/session, or ฿3,000 for a 5-session bundle (฿600/session)');
+
+  // ---------- Plan selector ----------
+  document.querySelectorAll('.plan-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state.selectedPlan = card.dataset.plan;
+      log('plan selected → ' + (state.selectedPlan === 'bundle' ? '5-session bundle (฿3,000, ฿600/session)' : 'single session (฿750)'));
+      updateContinueBtn();
+    });
+  });
+
+  // ---------- Calendar ----------
+  const DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MON_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const SLOT_TIMES = [{h:9,label:'9:00 AM'},{h:13,label:'1:00 PM'},{h:17,label:'5:00 PM'}];
+
+  function normalizeDate(d) { const nd = new Date(d); nd.setHours(0,0,0,0); return nd; }
+  const TODAY = normalizeDate(new Date());
+  const WINDOW_DAYS = 30; // how far out booking is open — decided: 30 days
+  const WINDOW_END = new Date(TODAY);
+  WINDOW_END.setDate(TODAY.getDate() + WINDOW_DAYS - 1);
+
+  function dateFromIndex(idx) {
+    const d = new Date(TODAY);
+    d.setDate(TODAY.getDate() + idx);
+    return d;
+  }
+
+  let viewYear = TODAY.getFullYear();
+  let viewMonth = TODAY.getMonth();
+
+  // day-of-week header, built once
+  const dowRow = $('cal-dow-row');
+  DOW.forEach(d => {
+    const el = document.createElement('div');
+    el.textContent = d;
+    dowRow.appendChild(el);
+  });
+
+  function renderCalendar() {
+    $('cal-month-label').textContent = MON_FULL[viewMonth] + ' ' + viewYear;
+    const grid = $('cal-grid');
+    grid.innerHTML = '';
+
+    const firstOfMonth = new Date(viewYear, viewMonth, 1);
+    const startOffset = firstOfMonth.getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    for (let i = 0; i < startOffset; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'cal-cell empty';
+      grid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cellDate = normalizeDate(new Date(viewYear, viewMonth, day));
+      const diffDays = Math.round((cellDate - TODAY) / 86400000);
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      cell.textContent = day;
+
+      if (cellDate.getTime() === TODAY.getTime()) cell.classList.add('today');
+
+      if (cellDate < TODAY) {
+        cell.classList.add('past');
+      } else if (cellDate > WINDOW_END) {
+        cell.classList.add('closed');
+      } else {
+        cell.classList.add('available');
+        if (state.selectedDayIndex === diffDays) cell.classList.add('selected');
+        cell.addEventListener('click', () => selectDay(diffDays, cell));
+      }
+      grid.appendChild(cell);
+    }
+
+    const atCurrentMonth = (viewYear === TODAY.getFullYear() && viewMonth === TODAY.getMonth());
+    $('cal-prev').disabled = atCurrentMonth;
+  }
+
+  $('cal-prev').addEventListener('click', () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+  $('cal-next').addEventListener('click', () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  function selectDay(diffDays, cellEl) {
+    document.querySelectorAll('.cal-cell.selected').forEach(c => c.classList.remove('selected'));
+    cellEl.classList.add('selected');
+    state.selectedDayIndex = diffDays;
+    state.selectedDay = dateFromIndex(diffDays);
+    state.selectedTime = null;
+    renderTimeGrid(diffDays);
+    updateContinueBtn();
+    log('viewing availability for ' + fmtDate(state.selectedDay) + ' — mirrors an <span style="color:#D2A45C">availability</span> query');
+  }
+
+  renderCalendar();
+
+  // ---------- Day / time generation ----------
+
+  function renderTimeGrid(dayIdx) {
+    const grid = $('time-grid');
+    grid.innerHTML = '';
+    const isToday = dayIdx === 0;
+    const nowHour = new Date().getHours();
+    // deterministic pseudo-taken slot per day so it doesn't feel infinite
+    const takenIndex = dayIdx % 3;
+    SLOT_TIMES.forEach((slot, i) => {
+      const chip = document.createElement('div');
+      const pastToday = isToday && slot.h <= nowHour;
+      const takenByOther = (i === takenIndex && dayIdx !== 0);
+      chip.className = 'time-chip' + ((pastToday || takenByOther) ? ' taken' : '');
+      chip.textContent = pastToday ? slot.label + ' · past' : (takenByOther ? slot.label + ' · taken' : slot.label);
+      if (!pastToday && !takenByOther) {
+        chip.addEventListener('click', () => selectTime(slot, chip));
+      }
+      grid.appendChild(chip);
+    });
+  }
+
+  function selectTime(slot, chipEl) {
+    document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+    chipEl.classList.add('selected');
+    state.selectedTime = slot;
+    updateContinueBtn();
+  }
+
+  function fmtDate(d) {
+    return DOW[d.getDay()] + ', ' + d.getDate() + ' ' + MON[d.getMonth()];
+  }
+
+  function fmtWhen() {
+    if (!state.selectedDay || !state.selectedTime) return '—';
+    return fmtDate(state.selectedDay) + ' · ' + state.selectedTime.label + ' (Chiang Mai)';
+  }
+
+  // ---------- Step 1 -> validation ----------
+  const inputsToWatch = ['fname', 'lname', 'email'];
+  inputsToWatch.forEach(id => $(id).addEventListener('input', updateContinueBtn));
+
+  function updateContinueBtn() {
+    const ok = state.selectedPlan && $('fname').value.trim() && $('lname').value.trim() &&
+      /\S+@\S+\.\S+/.test($('email').value.trim()) &&
+      state.selectedDay && state.selectedTime;
+    $('to-payment').disabled = !ok;
+  }
+
+  // ---------- Step navigation ----------
+  function goStep(n) {
+    document.querySelectorAll('.panel-step').forEach(p => p.classList.remove('visible'));
+    $('step-' + n).classList.add('visible');
+    [1,2,3].forEach(i => {
+      const pill = $('pill-' + i);
+      pill.classList.remove('active','done');
+      if (i < n) pill.classList.add('done');
+      if (i === n) pill.classList.add('active');
+    });
+    state.step = n;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  $('to-payment').addEventListener('click', () => {
+    state.fname = $('fname').value.trim();
+    state.lname = $('lname').value.trim();
+    state.email = $('email').value.trim();
+
+    $('summary-when').textContent = fmtWhen();
+    $('summary-name').textContent = state.fname + ' ' + state.lname;
+
+    if (state.selectedPlan === 'bundle') {
+      $('summary-plan').textContent = '5-session bundle — booking session 1 of 5';
+      $('price-thb').textContent = '฿3,000';
+      $('price-usd').textContent = '≈ $91 USD / €85 EUR — ฿600/session, charged in THB';
+      $('price-tag').textContent = '5-session bundle';
+    } else {
+      $('summary-plan').textContent = 'Single session';
+      $('price-thb').textContent = '฿750';
+      $('price-usd').textContent = '≈ $23 USD / €21 EUR — charged in THB';
+      $('price-tag').textContent = 'single session';
+    }
+
+    log('<span style="color:#D2A45C">availability.locked_until</span> set → now + 15:00 for ' + fmtWhen());
+    log('<span style="color:#D2A45C">booking.status</span> = pending');
+
+    startHold();
+    goStep(2);
+  });
+
+  // ---------- Slot hold countdown ----------
+  function startHold() {
+    clearInterval(state.holdInterval);
+    state.holdSecondsLeft = 15 * 60;
+    state.holdExpired = false;
+    $('hold-badge').classList.remove('expired');
+    $('to-confirm').disabled = false;
+    updateHoldDisplay();
+    state.holdInterval = setInterval(() => {
+      state.holdSecondsLeft--;
+      if (state.holdSecondsLeft <= 0) {
+        clearInterval(state.holdInterval);
+        expireHold();
+      } else {
+        updateHoldDisplay();
+      }
+    }, 1000);
+  }
+
+  function updateHoldDisplay() {
+    const m = Math.floor(state.holdSecondsLeft / 60);
+    const s = state.holdSecondsLeft % 60;
+    $('hold-text').textContent = 'Slot held — ' + m + ':' + String(s).padStart(2,'0') + ' remaining';
+  }
+
+  function expireHold() {
+    state.holdExpired = true;
+    $('hold-badge').classList.add('expired');
+    $('hold-text').textContent = 'Hold expired — this slot has been released';
+    $('to-confirm').disabled = true;
+    log('<span style="color:#A34324">availability.locked_until</span> passed with no payment → slot auto-released');
+    log('<span style="color:#A34324">booking.status</span> = expired (never confirmed)');
+  }
+
+  function releaseHold(reason) {
+    clearInterval(state.holdInterval);
+    log('<span style="color:#A34324">availability.locked_until</span> cleared — ' + reason);
+  }
+
+  $('back-to-details').addEventListener('click', () => {
+    releaseHold('participant navigated back');
+    goStep(1);
+  });
+
+  // ---------- Card field formatting ----------
+  $('cardnum').addEventListener('input', (e) => {
+    let v = e.target.value.replace(/\D/g,'').slice(0,16);
+    e.target.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+  });
+  $('cardexp').addEventListener('input', (e) => {
+    let v = e.target.value.replace(/\D/g,'').slice(0,4);
+    if (v.length > 2) v = v.slice(0,2) + ' / ' + v.slice(2);
+    e.target.value = v;
+  });
+  $('cardcvc').addEventListener('input', (e) => {
+    e.target.value = e.target.value.replace(/\D/g,'').slice(0,4);
+  });
+
+  // ---------- Payment -> confirm ----------
+  $('to-confirm').addEventListener('click', () => {
+    if (state.holdExpired) return;
+    const btn = $('to-confirm');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="chevron">&gt;</span> Processing…';
+    log('stripe.paymentIntent → processing (mock)');
+
+    setTimeout(() => {
+      clearInterval(state.holdInterval);
+      state.bookingRef = 'ST-' + Math.random().toString(36).slice(2,10).toUpperCase();
+      state.booked = true;
+
+      log('stripe.paymentIntent → <span style="color:#3F6B4F">succeeded</span> (mock, pi_mock_' + Math.random().toString(36).slice(2,8) + ')');
+      log('<span style="color:#3F6B4F">booking.status</span> = confirmed — ref ' + state.bookingRef);
+      log('<span style="color:#3F6B4F">booking.reference</span> = ' + state.bookingRef);
+      log('email → BookingConfirmation → participant (' + state.email + ')');
+      log('email → NewBookingNotification → you');
+      log('cron → reminder scheduled for 24h before session');
+      if ($('newsletter').checked) log('email_subscribers += ' + state.email);
+
+      $('ref-num').textContent = state.bookingRef;
+      $('confirm-when').textContent = fmtWhen();
+      $('confirm-name').textContent = state.fname + ' ' + state.lname;
+      $('confirm-sub').textContent = 'A confirmation just went to ' + state.email + '.';
+      $('call-link').textContent = 'meet.google.com/' + Math.random().toString(36).slice(2,5) + '-' + Math.random().toString(36).slice(2,6) + '-' + Math.random().toString(36).slice(2,5);
+      log('calendar.events.insert → creating event on your Google Calendar for ' + fmtWhen());
+      log('conferenceData (conferenceDataVersion:1) → Meet link generated: ' + $('call-link').textContent);
+      log('calendar.events.insert → participant (' + state.email + ') added as invitee');
+      log('booking.calendar_event_id = evt_mock_' + Math.random().toString(36).slice(2,10));
+      log('booking.call_link = ' + $('call-link').textContent + ' — unique to this booking');
+
+      if (state.selectedPlan === 'bundle') {
+        $('confirm-plan').textContent = '5-session bundle';
+        $('confirm-paid').textContent = '฿3,000';
+        $('credits-panel').style.display = 'block';
+        $('credits-email').textContent = state.email;
+        log('session_credits row created → total: 5, used: 1, remaining: 4, tied to ' + state.email);
+      } else {
+        $('confirm-plan').textContent = 'Single session';
+        $('confirm-paid').textContent = '฿750';
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span class="chevron">&gt;</span> Pay &amp; confirm';
+      goStep(3);
+    }, 1400);
+  });
+
+  // ---------- Cancellation tier simulator ----------
+  document.querySelectorAll('.tier-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const hours = parseInt(btn.dataset.hours, 10);
+      const result = $('tier-result');
+      result.classList.remove('full','half','none','show');
+      let tier, text;
+
+      if (state.selectedPlan === 'bundle') {
+        // Bundle credits: binary 24h line, decided in §6 — no partial credit, so no "half" tier.
+        if (hours >= 24) {
+          tier = 'full';
+          text = 'Credit returns to your balance — you can rebook it anytime, since it\'s 24+ hours out.';
+        } else {
+          tier = 'none';
+          text = 'Credit forfeited — it\'s under 24 hours before the session, so this one is spent.';
+        }
+        log('cancellation simulated at T-' + hours + 'h (bundle credit) → ' + tier + ' — ' + (tier === 'full' ? 'credit restored' : 'credit forfeited'));
+      } else {
+        // Single session, paid in cash: the standard three tiers, at the real ฿750 price.
+        let refundAmount;
+        if (hours >= 48) { tier = 'full'; refundAmount = '฿750'; text = '100% refund — ' + refundAmount + ' back, since it\'s 48+ hours out.'; }
+        else if (hours >= 24) { tier = 'half'; refundAmount = '฿375'; text = '50% refund — ' + refundAmount + ' back, since it\'s 24–48 hours out.'; }
+        else { tier = 'none'; refundAmount = '฿0'; text = 'No refund — it\'s under 24 hours before the session.'; }
+        log('cancellation simulated at T-' + hours + 'h (single session) → refund tier: ' + tier + ' (' + refundAmount + ')');
+      }
+
+      result.classList.add(tier, 'show');
+      result.textContent = text;
+    });
+  });
+
+  // ---------- Restart ----------
+  $('book-another').addEventListener('click', () => {
+    log('— new booking session started —');
+    document.querySelectorAll('.time-chip, .plan-card').forEach(c => c.classList.remove('selected'));
+    ['fname','lname','email','phone','notes','cardnum','cardexp','cardcvc'].forEach(id => $(id).value = '');
+    $('newsletter').checked = false;
+    state.selectedPlan = null; state.selectedDay = null; state.selectedDayIndex = null; state.selectedTime = null;
+    viewYear = TODAY.getFullYear(); viewMonth = TODAY.getMonth();
+    renderCalendar();
+    $('time-grid').innerHTML = '';
+    $('credits-panel').style.display = 'none';
+    updateContinueBtn();
+    $('tier-result').classList.remove('show');
+    document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+    goStep(1);
+  });
+
+})();
+</script>
+
+</body>
+</html>

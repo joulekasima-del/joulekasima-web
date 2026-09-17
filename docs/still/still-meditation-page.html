@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Still — Guided Meditation | Joule Kasima</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --bg-panel: #F1EEE6;
+    --white: #FFFFFF;
+    --ink: #13161C;
+    --ink-soft: #5B6069;
+    --ink-faint: #8B909A;
+    --line: #DFDCD4;
+    --accent: #8A5F24;
+    --accent-bg: #EFE3CD;
+    --accent-line: #D9C6A0;
+
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, 'system-ui', sans-serif;
+    --mono: 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121417;
+      --bg-panel: #191C20;
+      --white: #1B1E22;
+      --ink: #F2F1EC;
+      --ink-soft: #A9ADB4;
+      --ink-faint: #6C7178;
+      --line: #2A2D32;
+      --accent: #D2A45C;
+      --accent-bg: #2A2114;
+      --accent-line: #4A3A22;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #121417;
+    --bg-panel: #191C20;
+    --white: #1B1E22;
+    --ink: #F2F1EC;
+    --ink-soft: #A9ADB4;
+    --ink-faint: #6C7178;
+    --line: #2A2D32;
+    --accent: #D2A45C;
+    --accent-bg: #2A2114;
+    --accent-line: #4A3A22;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent-bg); color: var(--accent); }
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.site {
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .site-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 28px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .wordmark {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 19px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .wordmark .venture-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-line);
+    border-radius: 2px;
+    padding: 2px 8px;
+  }
+
+  nav.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  nav.site-nav a.bracket {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--ink-faint);
+    text-decoration: none;
+  }
+
+  nav.site-nav a.bracket .b {
+    color: var(--ink-faint);
+    opacity: 0.55;
+  }
+
+  nav.site-nav a.bracket:hover { color: var(--ink-soft); }
+
+  .contact-btn {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    padding: 8px 14px;
+    text-decoration: none;
+  }
+  .contact-btn:hover { background: var(--ink); color: var(--bg); }
+
+  /* ---------- Sections ---------- */
+
+  section { padding: 72px 0; }
+  section + section { border-top: 1px solid var(--line); }
+
+  /* ---------- Hero ---------- */
+
+  .hero { padding: 88px 0 68px; }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent);
+    margin: 0 0 22px;
+  }
+
+  .kicker .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--accent);
+    vertical-align: -2px;
+    margin-left: 2px;
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(48px, 9vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin: 0 0 22px;
+    color: var(--ink);
+  }
+
+  .lede {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: clamp(19px, 3vw, 22px);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 36ch;
+    margin: 0 0 20px;
+  }
+
+  .hero .body-copy {
+    max-width: 48ch;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin: 0 0 36px;
+  }
+
+  /* ---------- Buttons ---------- */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    padding: 13px 22px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover { background: transparent; color: var(--ink); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .btn .chevron { color: var(--ink-faint); }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink);
+    border-radius: 3px;
+    padding: 12px 21px;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--bg); }
+  .btn-outline:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- Headings ---------- */
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(26px, 4vw, 30px);
+    line-height: 1.2;
+    margin: 0 0 26px;
+    max-width: 22ch;
+  }
+
+  .section-lead {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 52ch;
+    margin: 0 0 6px;
+  }
+
+  /* ---------- Problem ---------- */
+
+  .problem p {
+    font-size: 18px;
+    max-width: 54ch;
+    margin: 0 0 20px;
+    color: var(--ink);
+  }
+  .problem p.quiet { color: var(--ink-soft); }
+  .problem p.turn {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 21px;
+    color: var(--ink);
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- How it works ---------- */
+
+  .steps { list-style: none; margin: 40px 0 0; padding: 0; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 4px 18px;
+    padding: 24px 0;
+  }
+  .step + .step { border-top: 1px solid var(--line); }
+
+  .step .num {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent);
+    padding-top: 3px;
+  }
+
+  .step h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 16.5px;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+
+  .step p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    max-width: 46ch;
+  }
+
+  /* ---------- Who this is for ---------- */
+
+  .audience {
+    margin: 36px 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 54ch;
+    border-top: 1px solid var(--line);
+  }
+
+  .audience li {
+    padding: 15px 0;
+    font-size: 16.5px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .note-pill {
+    display: inline-block;
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-line);
+    border-radius: 2px;
+    padding: 4px 10px;
+  }
+
+  /* ---------- About ---------- */
+
+  .about .loc {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin: 0 0 22px;
+  }
+
+  .about p {
+    font-size: 17px;
+    max-width: 56ch;
+    color: var(--ink);
+    margin: 0 0 20px;
+  }
+
+  .link-underline {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--accent);
+    padding-bottom: 2px;
+  }
+  .link-underline .chevron { color: var(--accent); margin-right: 4px; }
+
+  /* ---------- Session details ---------- */
+
+  .details-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 36px;
+    margin-top: 32px;
+  }
+
+  .details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+    padding: 15px 0;
+  }
+  .details-row + .details-row { border-top: 1px solid var(--line); }
+
+  .details-row .label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  .details-row .value {
+    font-size: 15.5px;
+    color: var(--ink);
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .price-note {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 15px;
+    margin: 22px 0 28px;
+  }
+
+  /* ---------- FAQ ---------- */
+
+  .faq-item {
+    padding: 24px 0;
+    max-width: 56ch;
+    border-top: 1px solid var(--line);
+  }
+  .faq-item:last-child { border-bottom: 1px solid var(--line); }
+
+  .faq-item .q {
+    font-weight: 600;
+    font-size: 15.5px;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .faq-item .a {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+  }
+
+  /* ---------- Closing ---------- */
+
+  .closing { padding-bottom: 100px; }
+  .closing h2 { max-width: 16ch; }
+  .closing p {
+    color: var(--ink-soft);
+    font-size: 17px;
+    max-width: 40ch;
+    margin: 0 0 32px;
+  }
+
+  footer.site-footer {
+    padding: 32px 0 56px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  footer.site-footer a { color: var(--ink-faint); text-decoration: none; }
+  footer.site-footer a:hover { color: var(--ink-soft); }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+
+  @media (max-width: 560px) {
+    .wrap, .site-inner { padding: 0 20px; }
+    section { padding: 52px 0; }
+    .hero { padding: 56px 0 44px; }
+    .details-panel { padding: 26px 20px; }
+    .details-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .details-row .value { text-align: left; }
+    nav.site-nav a.bracket:not(.contact-btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="site">
+    <div class="site-inner">
+      <a class="wordmark" href="https://www.joulekasima.com">Joule Kasima <span class="venture-tag">still</span></a>
+      <nav class="site-nav">
+        <a class="bracket" href="https://www.joulekasima.com/#ventures"><span class="b">[</span> ventures <span class="b">]</span></a>
+        <a class="contact-btn" href="/book">[ book ]</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="kicker">&gt; guided meditation · 1:1 · live<span class="cursor"></span></p>
+      <h1>Still</h1>
+      <p class="lede">For people who can't switch off.</p>
+      <p class="body-copy">I help founders, engineers, and anyone whose mind won't stop running find 30 minutes of real quiet. Built around whatever's actually going on for you that day.</p>
+      <a class="btn" href="/book"><span class="chevron">&gt;</span> Book a session</a>
+    </div>
+  </section>
+
+  <section class="problem">
+    <div class="wrap">
+      <h2>The problem, named plainly</h2>
+      <p>Your work doesn't stop when the laptop closes. Deadlines follow you into the evening. Notifications follow you into bed.</p>
+      <p class="quiet">You've tried apps — the same ten-minute recording, on repeat, going nowhere.</p>
+      <p class="turn">This is different. It's a real conversation, then a practice built for that exact moment. Not a script.</p>
+    </div>
+  </section>
+
+  <section class="how">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <p class="section-lead">Three steps. No forms, nothing to prepare.</p>
+      <ol class="steps">
+        <li class="step">
+          <span class="num">01</span>
+          <div>
+            <h3>We talk for a few minutes.</h3>
+            <p>What's actually stressing you out this week — a launch, a deadline, burnout, a mind that won't quiet down. No judgment, no forms to fill out first.</p>
+          </div>
+        </li>
+        <li class="step">
+          <span class="num">02</span>
+          <div>
+            <h3>I guide you through a practice made for that.</h3>
+            <p>Not generic. Built on the spot, for what you told me.</p>
+          </div>
+        </li>
+        <li class="step">
+          <span class="num">03</span>
+          <div>
+            <h3>You leave with something you can use again.</h3>
+            <p>A breath, a phrase, a way back to quiet — something small enough to carry into your next meeting.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="who">
+    <div class="wrap">
+      <h2>Who this is for</h2>
+      <ul class="audience">
+        <li>Founders carrying the whole company in their head</li>
+        <li>Engineers buried in a sprint that won't end</li>
+        <li>Anyone quietly burning out and not sure who to tell</li>
+        <li>People who've tried meditation apps and bounced off them</li>
+        <li>Anyone who just needs 30 minutes where their brain isn't sprinting</li>
+      </ul>
+      <span class="note-pill">[ no experience needed ]</span>
+    </div>
+  </section>
+
+  <section class="about">
+    <div class="wrap">
+      <h2>About me</h2>
+      <p class="loc">chiang mai, thailand · sessions held over a call</p>
+      <p>I started taking meditation seriously in 2018 — not as a trend, but as something I actually needed. In 2020, I completed a 200-hour yoga teacher training, stayed for another year, and began guiding meditation at Wonderland, a healing center on Koh Phangan.</p>
+      <p>I've held onto the practice ever since, using it to ease up my own brain first, and teaching others to do the same.</p>
+      <a class="link-underline" href="https://www.joulekasima.com/#contact"><span class="chevron">&gt;</span>Get in touch</a>
+    </div>
+  </section>
+
+  <section class="session">
+    <div class="wrap">
+      <h2>Session details</h2>
+      <p class="section-lead">30 minutes. 1:1. Over a call, wherever you're comfortable.</p>
+      <p class="section-lead">Each session starts with a short check-in, then moves into a guided practice built around what you're carrying that day.</p>
+
+      <div class="details-panel">
+        <div class="details-row">
+          <span class="label">format</span>
+          <span class="value">1:1, live, over a call</span>
+        </div>
+        <div class="details-row">
+          <span class="label">length</span>
+          <span class="value">30 minutes</span>
+        </div>
+        <div class="details-row">
+          <span class="label">price</span>
+          <span class="value">฿750 / session</span>
+        </div>
+        <div class="details-row">
+          <span class="label">5-session bundle</span>
+          <span class="value">฿3,000 — save ฿750</span>
+        </div>
+      </div>
+      <p class="price-note">The bundle pays for itself in four sessions — you'll see both options when you book.</p>
+      <a class="btn-outline" href="/book"><span class="chevron">&gt;</span> Book a session</a>
+    </div>
+  </section>
+
+  <section class="faq">
+    <div class="wrap">
+      <h2>A few honest answers</h2>
+      <div class="faq-item">
+        <p class="q">I've never meditated before. Is that okay?</p>
+        <p class="a">Yes — most people who book haven't. There's nothing to get right.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">What if I just want to talk, not "meditate"?</p>
+        <p class="a">That's still meditation, in a sense. We start with talking either way.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">Can I do this in person if I'm in Chiang Mai?</p>
+        <p class="a">Sessions are held over a call — it tends to work better that way. You can stay wherever you feel most comfortable, instead of having to travel or sit in an unfamiliar space.</p>
+      </div>
+      <div class="faq-item">
+        <p class="q">What language do you teach in?</p>
+        <p class="a">English and Thai.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="wrap">
+      <h2>You don't need another app.</h2>
+      <p>You need 30 minutes that's actually yours.</p>
+      <a class="btn" href="/book"><span class="chevron">&gt;</span> Book a session</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-inner">
+        <span>© 2026 Joule Kasima</span>
+        <span class="footer-links">
+          <a href="https://www.joulekasima.com">Joule Kasima</a>
+          <a href="mailto:hello@joulekasima.com">hello@joulekasima.com</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
