@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a session — Still | Joule Kasima</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="https://www.joulekasima.com" class="wordmark">Joule Kasima<span class="venture-tag">still</span></a>
+    <nav class="primary-nav" style="display:flex;">
+      <a href="/still">back to still</a>
+    </nav>
+  </div>
+</header>
+
+<main class="book-main">
+  <div class="book-wrap">
+
+    <div class="stepper">
+      <div class="step-pill active" id="pill-1"><span class="n">1</span><span class="label-text">&nbsp;details</span></div>
+      <div class="step-pill" id="pill-2"><span class="n">2</span><span class="label-text">&nbsp;payment</span></div>
+      <div class="step-pill" id="pill-3"><span class="n">3</span><span class="label-text">&nbsp;confirmed</span></div>
+    </div>
+
+    <!-- STEP 1 — DETAILS -->
+    <section class="panel-step visible" id="step-1">
+      <h1 class="page-title">Book a session</h1>
+      <p class="page-sub">30 minutes, 1:1, over a call. Pick a time and tell me a little about you — the practice gets built around what you share.</p>
+
+      <h2 class="block-title">&gt; how many sessions?</h2>
+      <div class="qty-panel">
+        <div class="qty-row">
+          <div class="qty-stepper">
+            <button class="qty-btn" id="qty-minus" type="button" aria-label="Decrease quantity">&minus;</button>
+            <span class="qty-value" id="qty-value">1</span>
+            <button class="qty-btn" id="qty-plus" type="button" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="qty-total">
+            <div class="amount" id="qty-total-thb">฿750</div>
+            <div class="breakdown" id="qty-breakdown">1 session &times; ฿750</div>
+          </div>
+        </div>
+        <p class="qty-note" id="qty-note">฿750 per session, flat. Want more than one? Use the + above — you'll pick a time for each one before paying.</p>
+      </div>
+
+      <h2 class="block-title">&gt; your details</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="fname">First name</label>
+          <input type="text" id="fname" placeholder="Jamie">
+        </div>
+        <div class="field">
+          <label for="lname">Last name</label>
+          <input type="text" id="lname" placeholder="Rivera">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="jamie@example.com">
+        </div>
+        <div class="field">
+          <label for="phone">Phone <span class="optional-tag">(optional)</span></label>
+          <input type="tel" id="phone" placeholder="+66 8x xxx xxxx">
+        </div>
+      </div>
+
+      <h2 class="block-title" style="margin-top: 28px;" id="picker-heading">&gt; choose a day <span id="picker-heading-sub" style="color:var(--ink-faint); font-weight:400;"></span></h2>
+
+      <div class="picked-list" id="picked-list"></div>
+      <p class="all-picked-note" id="all-picked-note" hidden></p>
+      <p class="field-error" id="slot-error" hidden></p>
+
+      <div id="picker-panel">
+        <div class="calendar" id="calendar">
+          <div class="cal-head">
+            <button class="cal-nav" id="cal-prev" type="button" aria-label="Previous month">&lt;</button>
+            <span class="cal-month" id="cal-month-label">—</span>
+            <button class="cal-nav" id="cal-next" type="button" aria-label="Next month">&gt;</button>
+          </div>
+          <div class="cal-dow-row" id="cal-dow-row"></div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-legend"><span><span class="dot"></span> open for booking</span><span style="opacity:0.5;">greyed = past, full, or not yet open</span></div>
+        </div>
+
+        <h2 class="block-title">&gt; choose a time <span style="color:var(--ink-faint); font-weight:400;">(Chiang Mai time, GMT+7)</span></h2>
+        <div class="time-grid" id="time-grid"></div>
+      </div>
+
+      <div class="field">
+        <label for="notes">Anything I should know before we start? <span class="optional-tag">(optional)</span></label>
+        <textarea id="notes" placeholder="A launch this week, a mind that won't stop, or nothing in particular — whatever's true."></textarea>
+      </div>
+
+      <div class="action-row" style="justify-content: flex-end;">
+        <button class="book-btn" id="to-payment" disabled><span class="chevron">&gt;</span> Continue to payment</button>
+      </div>
+    </section>
+
+    <!-- STEP 2 — PAYMENT -->
+    <section class="panel-step" id="step-2">
+      <h1 class="page-title">Confirm &amp; pay</h1>
+      <p class="page-sub">Your slots are held while you finish this step.</p>
+
+      <div class="hold-badge" id="hold-badge">
+        <span class="dot"></span> <span id="hold-text">Slots held — 15:00 remaining</span>
+      </div>
+
+      <div class="book-panel">
+        <div class="summary-row"><span class="label">plan</span><span class="value" id="summary-plan">—</span></div>
+        <div class="summary-row"><span class="label">session</span><span class="value">Still — 1:1 guided meditation</span></div>
+        <div id="summary-when-list"></div>
+        <div class="summary-row"><span class="label">duration</span><span class="value">30 minutes each</span></div>
+        <div class="summary-row"><span class="label">format</span><span class="value">Live, over a call</span></div>
+        <div class="summary-row"><span class="label">booking for</span><span class="value" id="summary-name">—</span></div>
+      </div>
+
+      <h2 class="block-title">&gt; price</h2>
+      <div class="price-block">
+        <div>
+          <div class="thb" id="price-thb">฿750</div>
+          <div class="usd" id="price-usd">—</div>
+        </div>
+        <div class="ptag" id="price-tag">1 session</div>
+      </div>
+
+      <h2 class="block-title">&gt; payment</h2>
+      <div class="stripe-el-wrap">
+        <div id="payment-element"></div>
+      </div>
+      <p class="field-error" id="payment-error" hidden></p>
+
+      <div class="policy-box">
+        Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. If I have to cancel, you're always fully refunded. Cancelling one session never affects the others in the same purchase.
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="newsletter">
+        <label for="newsletter">Join the Still mailing list for quiet, occasional notes. Unchecked by default.</label>
+      </div>
+
+      <div class="action-row">
+        <button class="book-btn-text" id="back-to-details">&larr; back to details</button>
+        <button class="book-btn" id="to-confirm"><span class="chevron">&gt;</span> <span id="to-confirm-label">Pay &amp; confirm</span></button>
+      </div>
+    </section>
+
+    <!-- STEP 3 — CONFIRMATION -->
+    <section class="panel-step" id="step-3">
+      <div class="confirm-badge">&#10003; Booking confirmed</div>
+      <h1 class="page-title">You're set.</h1>
+      <p class="page-sub" id="confirm-sub">A confirmation just went to your email.</p>
+
+      <div class="book-panel">
+        <div class="summary-row"><span class="label">session type</span><span class="value">Still — 1:1 guided meditation, 30 min</span></div>
+        <div class="summary-row"><span class="label">booked for</span><span class="value" id="confirm-name">—</span></div>
+        <div class="summary-row"><span class="label">total paid</span><span class="value" id="confirm-paid">฿750</span></div>
+      </div>
+
+      <div id="confirm-sessions-list"></div>
+
+      <p style="font-size: 14px; color: var(--ink-soft);">A reminder goes out 24 hours and 15 minutes before each session. Nothing else to prepare — every one's already on the calendar.</p>
+
+      <div class="action-row" style="justify-content: flex-start; margin-top: 36px;">
+        <button class="book-btn-outline" id="book-another"><span class="chevron">&gt;</span> Book another session</button>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer" style="max-width: 640px; margin: 0 auto; border-top: 1px solid var(--line);">
+  <p style="font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint);">Payments are processed securely by Stripe. Your card details never touch our servers.</p>
+</footer>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="book.js"></script>
+</body>
+</html>
