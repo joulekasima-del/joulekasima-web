@@ -78,7 +78,7 @@ create table if not exists bookings (
   reminder_15m_sent boolean not null default false,
   newsletter_opt_in boolean not null default false,
 
-  cancel_token text not null default encode(gen_random_bytes(18), 'base64url'),
+  cancel_token text not null default rtrim(translate(encode(gen_random_bytes(18), 'base64'), '+/', '-_'), '='),
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
