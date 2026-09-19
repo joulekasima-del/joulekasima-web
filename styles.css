@@ -349,6 +349,20 @@ h1, h2, h3 {
   margin: 0 0 18px;
 }
 
+.spotlight-launch {
+  display: inline-block;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  background: var(--paper-alt, #f2efe9);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  margin: 0 0 18px;
+}
+
 .spotlight-list {
   list-style: none;
   padding: 0;
