@@ -428,7 +428,7 @@ h1, h2, h3 {
   padding: 24px;
 }
 
-.creative { padding: 0 32px 96px; }
+.creative { padding: 40px 32px 96px; border-top: 1px solid var(--line); }
 .creative-card { max-width: 720px; }
 
 .quiet-title {
