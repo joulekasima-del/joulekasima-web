@@ -18,14 +18,6 @@ jobs:
           CRON_SECRET: ${{ secrets.STILL_CRON_SECRET }}
           SITE_URL: ${{ vars.STILL_SITE_URL || 'https://www.joulekasima.com' }}
         run: |
-          # TEMPORARY DIAGNOSTIC — safe to leave in briefly: prints only a
-          # SHA-256 fingerprint of the secret GitHub has, never the value
-          # itself, so it can be compared against the real Vercel value's
-          # fingerprint without exposing either one anywhere. Remove this
-          # echo line once the mismatch is confirmed fixed.
-          echo "GitHub secret length: ${#CRON_SECRET}"
-          echo "GitHub secret SHA256: $(printf '%s' "$CRON_SECRET" | shasum -a 256 | cut -d' ' -f1)"
-
           status=$(curl -s -o /tmp/response.json -w "%{http_code}" \
             -X GET "$SITE_URL/api/still/cron-reminder" \
             -H "Authorization: Bearer $CRON_SECRET")
