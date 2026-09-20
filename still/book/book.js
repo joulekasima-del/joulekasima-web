@@ -456,7 +456,11 @@
       // instead of treating this as an error.
       if (paymentIntent.status === 'processing') {
         clearInterval(state.holdInterval);
-        showPendingConfirmation();
+        showPendingConfirmation({
+          name: `${state.fname} ${state.lname}`,
+          email: state.email,
+          totalPaidThb: state.pickedSessions.length * PRICE_PER_SESSION,
+        });
         return;
       }
       if (paymentIntent.status !== 'succeeded') {
@@ -474,7 +478,12 @@
       }
 
       clearInterval(state.holdInterval);
-      showConfirmation(data.sessions);
+      showConfirmation({
+        name: `${data.first_name} ${data.last_name}`,
+        email: data.email,
+        totalPaidThb: data.total_paid_thb,
+        sessions: data.sessions,
+      });
     } catch (err) {
       $('payment-error').hidden = false;
       $('payment-error').textContent = err.message;
@@ -484,14 +493,13 @@
     }
   });
 
-  function showConfirmation(sessions) {
+  function showConfirmation({ name, email, totalPaidThb, sessions }) {
     $('confirm-badge').innerHTML = '&#10003; Booking confirmed';
-    $('confirm-name').textContent = `${state.fname} ${state.lname}`;
-    const totalPaid = sessions.length * PRICE_PER_SESSION;
-    $('confirm-paid').textContent = '฿' + totalPaid.toLocaleString('en-US');
+    $('confirm-name').textContent = name;
+    $('confirm-paid').textContent = '฿' + Number(totalPaidThb || 0).toLocaleString('en-US');
     $('confirm-sub').textContent = sessions.length > 1
-      ? `A confirmation just went to ${state.email} — all ${sessions.length} sessions are booked.`
-      : `A confirmation just went to ${state.email}.`;
+      ? `A confirmation just went to ${email} — all ${sessions.length} sessions are booked.`
+      : `A confirmation just went to ${email}.`;
 
     const listEl = $('confirm-sessions-list');
     listEl.innerHTML = '';
@@ -518,15 +526,95 @@
   // interval reset because the hold no longer matters: Stripe has the
   // payment, and finalizeSession() marks the slot booked once the webhook
   // fires, independent of whether the local 15-minute hold already lapsed.
-  function showPendingConfirmation() {
+  function showPendingConfirmation(opts) {
+    const o = opts || {};
     $('confirm-badge').textContent = 'Payment received';
-    $('confirm-name').textContent = `${state.fname} ${state.lname}`;
-    $('confirm-paid').textContent = '฿' + (state.pickedSessions.length * PRICE_PER_SESSION).toLocaleString('en-US');
-    $('confirm-sub').textContent =
-      `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in ${state.email} within a few minutes.`;
+    $('confirm-name').textContent = o.name || '';
+    $('confirm-paid').textContent = o.totalPaidThb != null
+      ? '฿' + Number(o.totalPaidThb).toLocaleString('en-US')
+      : '';
+    $('confirm-sub').textContent = o.email
+      ? `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in ${o.email} within a few minutes.`
+      : `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in your inbox within a few minutes.`;
     $('confirm-sessions-list').innerHTML = '';
     goStep(3);
   }
+
+  // Shown when the participant is sent back from an off-page redirect but
+  // we couldn't confirm the booking automatically (payment failed/canceled,
+  // or the confirm call itself errored). Reuses the step-3 layout since it
+  // already has the "book another" reset button.
+  function showRedirectError(message) {
+    $('confirm-badge').textContent = 'Could not confirm automatically';
+    $('confirm-name').textContent = '';
+    $('confirm-paid').textContent = '';
+    $('confirm-sub').textContent = message;
+    $('confirm-sessions-list').innerHTML = '';
+    goStep(3);
+  }
+
+  // ---------- Handle return from an off-page redirect ----------
+  // stripe.confirmPayment() is called with redirect: 'if_required', which
+  // avoids navigating away for most payment methods. Some async/local
+  // methods (PromptPay can behave this way depending on the customer's
+  // banking app) may still send the browser through a hosted step and back
+  // to return_url instead of resolving in-page. On that return trip Stripe
+  // appends payment_intent / payment_intent_client_secret / redirect_status
+  // to the URL — without handling that here, the page just reloads to a
+  // blank step 1 even though the payment went through (all in-memory
+  // state, including who's paying, is lost on a full reload).
+  // /api/still/finalize needs only the payment_intent id and now returns
+  // the participant's name/email/amount itself, so this doesn't depend on
+  // any of the state that didn't survive the reload.
+  async function handleRedirectReturn() {
+    const params = new URLSearchParams(window.location.search);
+    const paymentIntentId = params.get('payment_intent');
+    const redirectStatus = params.get('redirect_status');
+    if (!paymentIntentId || !redirectStatus) return;
+
+    // Drop these from the URL right away so a refresh doesn't replay this.
+    window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+
+    if (redirectStatus === 'failed' || redirectStatus === 'canceled') {
+      showRedirectError('Payment was not completed, so nothing was booked or charged. Please start a new booking.');
+      return;
+    }
+
+    try {
+      const r = await fetch('/api/still/finalize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_intent_id: paymentIntentId }),
+      });
+      const data = await r.json();
+
+      if (r.ok) {
+        showConfirmation({
+          name: `${data.first_name} ${data.last_name}`,
+          email: data.email,
+          totalPaidThb: data.total_paid_thb,
+          sessions: data.sessions,
+        });
+        return;
+      }
+
+      if (r.status === 409) {
+        // Payment hasn't settled to 'succeeded' yet — expected for some
+        // async methods, not an error. The webhook will finalize it and
+        // the confirmation email follows shortly; nothing more to do here.
+        showPendingConfirmation({});
+        return;
+      }
+
+      throw new Error(data.error || 'Could not confirm your booking.');
+    } catch (err) {
+      showRedirectError(
+        `We couldn't confirm your booking automatically. If you completed the payment, please contact ` +
+        `hello@joulekasima.com with payment reference ${paymentIntentId} — do not pay again.`
+      );
+    }
+  }
+  handleRedirectReturn();
 
   // ---------- Restart ----------
   $('book-another').addEventListener('click', () => {

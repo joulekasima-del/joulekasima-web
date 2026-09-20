@@ -28,8 +28,13 @@ module.exports = async (req, res) => {
     }
 
     const confirmed = await finalizePurchase(payment_intent_id);
+    const first = confirmed[0];
     res.status(200).json({
       ok: true,
+      first_name: first.first_name,
+      last_name: first.last_name,
+      email: first.email,
+      total_paid_thb: confirmed.reduce((sum, b) => sum + (b.amount_paid_thb || 0), 0),
       sessions: confirmed.map((b) => ({
         reference: b.reference,
         call_link: b.call_link,
