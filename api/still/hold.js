@@ -22,6 +22,10 @@ module.exports = async (req, res) => {
       res.status(409).json({ error: 'That slot was just taken. Please pick another.' });
       return;
     }
+    if (err.message === 'TOO_SOON') {
+      res.status(409).json({ error: 'Sessions need to be booked at least 1 day in advance.' });
+      return;
+    }
     console.error('still/hold error', err);
     res.status(500).json({ error: 'Could not hold that slot.' });
   }
