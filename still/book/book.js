@@ -445,6 +445,20 @@
         confirmParams: { return_url: window.location.href },
       });
       if (error) throw new Error(error.message);
+
+      // Card payments resolve to 'succeeded' immediately, so we can finalize
+      // and show the full confirmation right away. Async local payment
+      // methods (PromptPay and similar) resolve to 'processing' here — the
+      // participant has already paid, but Stripe settles it a moment later
+      // and our webhook (webhook-stripe.js) finalizes the booking then.
+      // Calling /finalize before that would just 409 (it requires
+      // 'succeeded'), so show a lighter "you're set, hang tight" screen
+      // instead of treating this as an error.
+      if (paymentIntent.status === 'processing') {
+        clearInterval(state.holdInterval);
+        showPendingConfirmation();
+        return;
+      }
       if (paymentIntent.status !== 'succeeded') {
         throw new Error('Payment did not complete. Please try again.');
       }
@@ -471,6 +485,7 @@
   });
 
   function showConfirmation(sessions) {
+    $('confirm-badge').innerHTML = '&#10003; Booking confirmed';
     $('confirm-name').textContent = `${state.fname} ${state.lname}`;
     const totalPaid = sessions.length * PRICE_PER_SESSION;
     $('confirm-paid').textContent = '฿' + totalPaid.toLocaleString('en-US');
@@ -493,6 +508,23 @@
       listEl.appendChild(card);
     });
 
+    goStep(3);
+  }
+
+  // Shown when payment has been accepted but is still settling (async
+  // methods like PromptPay). No session details yet — the webhook finalizes
+  // the booking moments later and the real confirmation email (with call
+  // links) follows automatically. This screen is not tied to a hold
+  // interval reset because the hold no longer matters: Stripe has the
+  // payment, and finalizeSession() marks the slot booked once the webhook
+  // fires, independent of whether the local 15-minute hold already lapsed.
+  function showPendingConfirmation() {
+    $('confirm-badge').textContent = 'Payment received';
+    $('confirm-name').textContent = `${state.fname} ${state.lname}`;
+    $('confirm-paid').textContent = '฿' + (state.pickedSessions.length * PRICE_PER_SESSION).toLocaleString('en-US');
+    $('confirm-sub').textContent =
+      `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in ${state.email} within a few minutes.`;
+    $('confirm-sessions-list').innerHTML = '';
     goStep(3);
   }
 
