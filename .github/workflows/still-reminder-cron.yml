@@ -24,6 +24,7 @@ jobs:
           echo "HTTP status: $status"
           cat /tmp/response.json
           if [ "$status" -ge 300 ]; then
-            echo "Reminder cron call failed."
+            body=$(cat /tmp/response.json | tr '\n' ' ' | cut -c1-300)
+            echo "::error::Reminder cron call failed — HTTP $status — $body"
             exit 1
           fi
