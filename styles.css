@@ -22,6 +22,34 @@
   --good-bg: #E4EEE6;
   --warn: #A34324;
   --warn-bg: #F5E4DC;
+
+  /* Spacing scale — 4px/8px-rooted hybrid, rem-based (accessible: scales
+     with user font-size per WCAG 1.4.4). Every page-gutter, section and
+     card padding sitewide draws from this scale instead of a one-off
+     pixel value — introduced to fix gutter/breakpoint/card-padding drift
+     across the main site, /still, and /still/book. Fine component-level
+     spacing inside the booking flow (calendar, chips, form fields) is
+     intentionally left as-is for now — see the spacing audit for scope. */
+  --space-1: 0.25rem;   /* 4px  */
+  --space-2: 0.5rem;    /* 8px  */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-7: 2rem;      /* 32px */
+  --space-8: 2.5rem;    /* 40px */
+  --space-9: 3rem;      /* 48px */
+  --space-10: 3.5rem;   /* 56px */
+  --space-11: 4rem;     /* 64px */
+  --space-12: 4.5rem;   /* 72px */
+  --space-13: 6rem;     /* 96px */
+
+  /* Semantic aliases — components reference these, not the raw scale */
+  --gutter-desktop: var(--space-7);         /* 32px page-edge gutter, desktop */
+  --gutter-mobile: var(--space-6);          /* 24px page-edge gutter, mobile */
+  --space-card-lg: var(--space-8);          /* 40px — spotlight-card, still-details-panel */
+  --space-card-lg-mobile: var(--space-6);   /* 24px */
+  --space-card-md: var(--space-6);          /* 24px — quiet-card, creative-card, qty-panel, book-panel, price-block */
 }
 
 * { box-sizing: border-box; }
@@ -45,7 +73,7 @@ body {
 .wrap {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 var(--gutter-desktop);
 }
 
 a { color: inherit; }
@@ -139,7 +167,7 @@ h1, h2, h3 {
 /* Hero */
 .hero {
   position: relative;
-  padding: 96px 32px 72px;
+  padding: var(--space-13) var(--gutter-desktop) var(--space-12);
   max-width: 780px;
 }
 
@@ -227,7 +255,7 @@ h1, h2, h3 {
 .btn-ghost:hover { border-color: var(--ink); }
 
 /* Intro */
-.intro { padding: 56px 32px 0; }
+.intro { padding: var(--space-10) var(--gutter-desktop) 0; }
 .intro-grid {
   border-top: 1px solid var(--line);
   padding-top: 40px;
@@ -307,14 +335,14 @@ h1, h2, h3 {
 .track-link:hover { color: var(--amber-deep); }
 
 /* Spotlight (Thai Talk Breaks) */
-.spotlight { padding: 0 32px 24px; }
+.spotlight { padding: 0 var(--gutter-desktop) var(--space-6); }
 
 .spotlight-card {
   background: #fff;
   border: 1px solid var(--line);
   border-left: 3px solid var(--amber);
   border-radius: 4px;
-  padding: 40px;
+  padding: var(--space-card-lg);
   max-width: 720px;
 }
 
@@ -418,17 +446,17 @@ h1, h2, h3 {
 .ventures-quiet {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 8px 32px 64px;
+  gap: var(--space-5);
+  padding: var(--space-2) var(--gutter-desktop) var(--space-11);
 }
 
 .quiet-card, .creative-card {
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: 24px;
+  padding: var(--space-card-md);
 }
 
-.creative { padding: 40px 32px 96px; border-top: 1px solid var(--line); }
+.creative { padding: var(--space-8) var(--gutter-desktop) var(--space-13); border-top: 1px solid var(--line); }
 .creative-card { max-width: 720px; }
 
 .quiet-title {
@@ -474,7 +502,7 @@ h1, h2, h3 {
 .quiet-action:hover { color: var(--amber-deep); }
 
 /* About */
-.about { padding: 40px 32px 96px; }
+.about { padding: var(--space-8) var(--gutter-desktop) var(--space-13); }
 .about-grid {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
@@ -513,7 +541,7 @@ h1, h2, h3 {
 
 /* Contact */
 .contact {
-  padding: 40px 32px 120px;
+  padding: var(--space-8) var(--gutter-desktop) var(--space-13);
   border-top: 1px solid var(--line);
   max-width: 620px;
 }
@@ -546,7 +574,7 @@ h1, h2, h3 {
 /* Footer */
 .site-footer {
   border-top: 1px solid var(--line);
-  padding: 28px 32px;
+  padding: var(--space-6) var(--gutter-desktop);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -568,7 +596,7 @@ h1, h2, h3 {
   .about-grid { grid-template-columns: 1fr; }
   .about-photo { aspect-ratio: 16 / 9; }
   .ventures-quiet { grid-template-columns: 1fr; }
-  .spotlight-card { padding: 28px 24px; }
+  .spotlight-card { padding: var(--space-card-lg-mobile) var(--gutter-mobile); }
 }
 
 @media (max-width: 680px) {
@@ -583,13 +611,20 @@ h1, h2, h3 {
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    padding: 8px 32px 20px;
+    padding: var(--space-2) var(--gutter-mobile) var(--space-5);
   }
   .primary-nav.open { display: flex; }
   .primary-nav a { padding: 12px 0; width: 100%; }
   .nav-toggle { display: flex; }
-  .hero { padding: 56px 24px 48px; }
-  .wrap { padding: 0 24px; }
+  .wrap { padding: 0 var(--gutter-mobile); }
+  .hero { padding: var(--space-10) var(--gutter-mobile) var(--space-9); }
+  .intro { padding: var(--space-8) var(--gutter-mobile) 0; }
+  .spotlight { padding: 0 var(--gutter-mobile) var(--space-5); }
+  .ventures-quiet { padding: var(--space-2) var(--gutter-mobile) var(--space-9); }
+  .creative { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
+  .about { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
+  .contact { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
+  .site-footer { padding: var(--space-6) var(--gutter-mobile); }
 }
 
 /* =========================================================================
@@ -608,9 +643,9 @@ h1, h2, h3 {
   margin-left: 8px;
 }
 
-.still-wrap { max-width: 720px; margin: 0 auto; padding: 0 28px; }
+.still-wrap { max-width: 720px; margin: 0 auto; padding: 0 var(--gutter-desktop); }
 
-.still-hero { padding: 88px 0 68px; }
+.still-hero { padding: var(--space-13) 0 var(--space-11); }
 
 .still-kicker {
   font-family: var(--font-mono);
@@ -649,7 +684,7 @@ h1, h2, h3 {
 
 .still-body-copy { max-width: 48ch; font-size: 18px; color: var(--ink-soft); margin: 0 0 36px; }
 
-.still-section { padding: 72px 0; }
+.still-section { padding: var(--space-12) 0; }
 .still-section + .still-section { border-top: 1px solid var(--line); }
 
 .still-h2 {
@@ -700,7 +735,7 @@ h1, h2, h3 {
 }
 .still-link-underline .chevron { color: var(--accent); margin-right: 4px; }
 
-.still-details-panel { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 3px; padding: 36px; margin-top: 32px; }
+.still-details-panel { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 3px; padding: var(--space-card-lg); margin-top: var(--space-7); }
 .still-details-row { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; padding: 15px 0; }
 .still-details-row + .still-details-row { border-top: 1px solid var(--line); }
 .still-details-row .label { font-family: var(--font-mono); font-size: 13px; color: var(--ink-faint); }
@@ -729,12 +764,15 @@ h1, h2, h3 {
 .still-btn-outline:hover { background: var(--ink); color: var(--paper); }
 .still-btn .chevron, .still-btn-outline .chevron { color: var(--ink-faint); }
 
+@media (max-width: 680px) {
+  .still-wrap { padding: 0 var(--gutter-mobile); }
+  .still-section { padding: var(--space-9) 0; }
+  .still-hero { padding: var(--space-10) 0 var(--space-9); }
+  .still-details-panel { padding: var(--space-card-lg-mobile) var(--gutter-mobile); }
+}
+
 @media (max-width: 560px) {
-  .still-wrap { padding: 0 20px; }
-  .still-section { padding: 52px 0; }
-  .still-hero { padding: 56px 0 44px; }
-  .still-details-panel { padding: 26px 20px; }
-  .still-details-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .still-details-row { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
   .still-details-row .value { text-align: left; }
 }
 
@@ -742,7 +780,7 @@ h1, h2, h3 {
    Still — booking flow (/book) and cancellation (/cancel)
    ========================================================================= */
 
-.book-wrap { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+.book-wrap { max-width: 640px; margin: 0 auto; padding: 0 var(--gutter-desktop); }
 .book-main { padding: 40px 0 90px; }
 
 .stepper { display: flex; gap: 6px; padding: 28px 0 0; font-family: var(--font-mono); font-size: 12.5px; }
@@ -834,7 +872,7 @@ h1, h2, h3 {
 
 .action-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 28px; }
 
-.book-panel { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 3px; padding: 22px 24px; margin-bottom: 24px; }
+.book-panel { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 3px; padding: var(--space-card-md); margin-bottom: var(--space-6); }
 .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; gap: 16px; }
 .summary-row + .summary-row { border-top: 1px solid var(--line); }
 .summary-row .label { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint); }
@@ -846,7 +884,7 @@ h1, h2, h3 {
 .hold-badge.expired { color: var(--warn); background: var(--warn-bg); border-color: var(--warn); }
 .hold-badge.expired .dot { background: var(--warn); animation: none; }
 
-.price-block { display: flex; justify-content: space-between; align-items: flex-end; border: 1px solid var(--line); border-radius: 3px; padding: 20px 24px; margin-bottom: 24px; background: #fff; }
+.price-block { display: flex; justify-content: space-between; align-items: flex-end; border: 1px solid var(--line); border-radius: 3px; padding: var(--space-card-md); margin-bottom: var(--space-6); background: #fff; }
 .price-block .thb { font-family: var(--font-display); font-size: 26px; }
 .price-block .usd { font-family: var(--font-mono); font-size: 13px; color: var(--ink-faint); margin-top: 4px; }
 .price-block .ptag { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 2px; padding: 3px 8px; height: fit-content; }
@@ -871,8 +909,11 @@ h1, h2, h3 {
 .banner-warn { background: var(--warn-bg); color: var(--warn); }
 .banner-good { background: var(--good-bg); color: var(--good); }
 
+@media (max-width: 680px) {
+  .book-wrap { padding: 0 var(--gutter-mobile); }
+}
+
 @media (max-width: 560px) {
-  .book-wrap { padding: 0 18px; }
   .field-row { grid-template-columns: 1fr; gap: 0; }
   .time-grid { grid-template-columns: repeat(2, 1fr); }
   .stepper .step-pill span.label-text { display: none; }
@@ -888,7 +929,7 @@ h1, h2, h3 {
    Still — quantity selector, picked-sessions list, session cards
    ========================================================================= */
 
-.qty-panel { background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 22px 24px; margin-bottom: 30px; }
+.qty-panel { background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: var(--space-card-md); margin-bottom: var(--space-7); }
 .qty-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .qty-stepper { display: flex; align-items: center; gap: 0; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
 .qty-btn { font-family: var(--font-mono); font-size: 16px; color: var(--ink); background: var(--bg-panel); border: none; width: 38px; height: 38px; cursor: pointer; }
