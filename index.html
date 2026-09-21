@@ -59,6 +59,17 @@
         <li>Free for 7 days, then continue with Telegram Stars</li>
       </ul>
       <p class="spotlight-community">Want more practice? Join <strong>Thai Talk: Jot It Down</strong> — a weekly Saturday exercise with the community.</p>
+
+      <!-- Remove this notify-me form when the block below is uncommented on the 10 Oct 2026 launch. -->
+      <form class="notify-form" id="thaiTalkNotifyForm" novalidate>
+        <label for="thaiTalkNotifyEmail" class="notify-form-label">Not ready to start yet? Get an email the day this launches.</label>
+        <div class="notify-form-row">
+          <input type="email" id="thaiTalkNotifyEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+          <button type="submit" class="btn btn-primary">Notify me</button>
+        </div>
+        <p class="notify-form-note" id="thaiTalkNotifyNote" hidden></p>
+      </form>
+
       <!-- HIDDEN UNTIL 10 OCT 2026 LAUNCH. Uncomment this block on 9 Oct 2026 to reveal the buttons.
       <div class="spotlight-actions">
         <a href="https://t.me/ThaiTalkBreaksBot" class="btn btn-telegram">
