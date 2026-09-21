@@ -1,6 +1,7 @@
 const { getSupabase } = require('../../lib/supabase');
 const { getResend, FROM } = require('../../lib/resend');
 const { reminderEmail } = require('../../lib/emails/templates');
+const { feedbackInviteEmail } = require('../../lib/emails/feedback-invite-templates');
 
 // Called every 5 minutes by the GitHub Actions workflow in
 // .github/workflows/still-reminder-cron.yml (not Vercel Cron — Hobby plan
@@ -29,12 +30,13 @@ module.exports = async (req, res) => {
       .from('bookings')
       .select('*, availability:availability_id(date, start_time)')
       .eq('status', 'confirmed')
-      .or('reminder_24h_sent.eq.false,reminder_15m_sent.eq.false');
+      .or('reminder_24h_sent.eq.false,reminder_15m_sent.eq.false,feedback_email_sent.eq.false');
     if (error) throw error;
 
     const resend = getResend();
     let sent24h = 0;
     let sent15m = 0;
+    let sentFeedback = 0;
 
     for (const booking of bookings || []) {
       const sessionStart = new Date(`${booking.availability.date}T${booking.availability.start_time}+07:00`);
@@ -60,10 +62,21 @@ module.exports = async (req, res) => {
         } catch (e) {
           console.error('Failed to send 15m reminder for', booking.reference, e);
         }
+      } else if (!booking.feedback_email_sent && hoursAway <= -24 && hoursAway >= -25) {
+        // Session started 24-25 hours ago — a low-pressure invite to share
+        // feedback, sent once per booking. See docs on session_feedback.
+        const template = feedbackInviteEmail(emailBooking);
+        try {
+          await resend.emails.send({ from: FROM, to: booking.email, subject: template.subject, html: template.html });
+          await supabase.from('bookings').update({ feedback_email_sent: true }).eq('id', booking.id);
+          sentFeedback++;
+        } catch (e) {
+          console.error('Failed to send feedback invite for', booking.reference, e);
+        }
       }
     }
 
-    res.status(200).json({ ok: true, sent24h, sent15m });
+    res.status(200).json({ ok: true, sent24h, sent15m, sentFeedback });
   } catch (err) {
     console.error('still/cron-reminder error', err);
     res.status(500).json({ error: 'Reminder cron failed.' });

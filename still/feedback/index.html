@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share feedback — Still | Joule Kasima</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="https://www.joulekasima.com" class="wordmark">Joule Kasima<span class="venture-tag">still</span></a>
+  </div>
+</header>
+
+<main class="book-main">
+  <div class="book-wrap" style="max-width: 520px;">
+
+    <div id="form-view">
+      <h1 class="page-title">How was your session?</h1>
+      <p class="page-sub">However it went, I'd love to hear about it — good, bad, or in between. This is just for me unless you say it's okay to share.</p>
+
+      <form id="feedbackForm" novalidate>
+        <div class="field">
+          <label for="fbName">Name</label>
+          <input type="text" id="fbName" name="name" required maxlength="200">
+        </div>
+
+        <div class="field">
+          <label for="fbMessage">How did it go?</label>
+          <textarea id="fbMessage" name="message" required maxlength="4000" rows="5" placeholder="Whatever's true — what helped, what didn't, anything at all."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="fbPhoto">Photo <span class="optional-tag">(optional)</span></label>
+          <input type="file" id="fbPhoto" name="photo" accept="image/jpeg,image/png,image/webp">
+        </div>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="fbConsent">
+          <label for="fbConsent">It's okay to share this publicly on the site, with my name (and photo, if I added one).</label>
+        </div>
+
+        <p class="field-error" id="fbError" hidden></p>
+
+        <div class="action-row" style="justify-content: flex-start;">
+          <button type="submit" class="book-btn" id="fbSubmit">Send feedback</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="done-view" hidden>
+      <h1 class="page-title">Thank you.</h1>
+      <p class="page-sub">I really appreciate you taking the time to share this.</p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(window.location.search);
+  const reference = params.get('ref') || null;
+
+  function readPhotoAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result || '';
+        const base64 = String(result).split(',')[1] || '';
+        resolve(base64);
+      };
+      reader.onerror = () => reject(new Error('Could not read that photo.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  $('feedbackForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('fbSubmit');
+    const errorEl = $('fbError');
+    errorEl.hidden = true;
+
+    const name = $('fbName').value.trim();
+    const message = $('fbMessage').value.trim();
+    const consent_public = $('fbConsent').checked;
+    const photoFile = $('fbPhoto').files[0] || null;
+
+    if (photoFile && photoFile.size > 5 * 1024 * 1024) {
+      errorEl.textContent = 'Photo must be under 5MB.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+      const payload = { reference, name, message, consent_public };
+      if (photoFile) {
+        payload.photo_base64 = await readPhotoAsBase64(photoFile);
+        payload.photo_type = photoFile.type;
+      }
+
+      const res = await fetch('/api/still/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not save your feedback.');
+
+      $('form-view').hidden = true;
+      $('done-view').hidden = false;
+    } catch (err) {
+      errorEl.textContent = err.message || 'Something went wrong — please try again.';
+      errorEl.hidden = false;
+      btn.disabled = false;
+      btn.textContent = 'Send feedback';
+    }
+  });
+})();
+</script>
+</body>
+</html>
