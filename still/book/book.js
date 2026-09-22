@@ -5,6 +5,17 @@
   const QTY_MAX = 10;
   const PRICE_PER_SESSION = 750;
 
+  // Reference-only conversion — participants are always charged in THB.
+  // Rates are a fixed approximation (not live), so they're clearly framed
+  // as "≈" and periodically worth a manual refresh against current FX.
+  const THB_PER_USD = 32.6;
+  const EUR_PER_USD = 0.92;
+  function fxApprox(totalThb) {
+    const usd = Math.round(totalThb / THB_PER_USD);
+    const eur = Math.round(usd * EUR_PER_USD);
+    return `≈ $${usd} USD / €${eur} EUR`;
+  }
+
   let stripe = null;
   let elements = null;
   const stripeReady = fetch('/api/still/config')
@@ -32,6 +43,7 @@
     const total = state.quantity * PRICE_PER_SESSION;
     $('qty-total-thb').textContent = '฿' + total.toLocaleString('en-US');
     $('qty-breakdown').textContent = state.quantity + ' session' + (state.quantity > 1 ? 's' : '') + ' × ฿750';
+    $('qty-total-fx').textContent = fxApprox(total);
     $('qty-minus').disabled = state.quantity <= QTY_MIN;
     $('qty-plus').disabled = state.quantity >= QTY_MAX;
     $('qty-note').textContent = state.quantity > 1
@@ -339,11 +351,9 @@
       $('summary-name').textContent = `${state.fname} ${state.lname}`;
 
       const totalThb = state.quantity * PRICE_PER_SESSION;
-      const usd = Math.round(totalThb / 32.6);
-      const eur = Math.round(usd * 0.92);
       $('summary-plan').textContent = state.quantity === 1 ? 'Single session' : `${state.quantity} sessions, all scheduled now`;
       $('price-thb').textContent = '฿' + totalThb.toLocaleString('en-US');
-      $('price-usd').textContent = `≈ $${usd} USD / €${eur} EUR — charged in THB`;
+      $('price-usd').textContent = `${fxApprox(totalThb)} — charged in THB`;
       $('price-tag').textContent = state.quantity === 1 ? '1 session' : `${state.quantity} sessions`;
 
       await setupPaymentIntent();
@@ -497,6 +507,7 @@
     $('confirm-badge').innerHTML = '&#10003; Booking confirmed';
     $('confirm-name').textContent = name;
     $('confirm-paid').textContent = '฿' + Number(totalPaidThb || 0).toLocaleString('en-US');
+    $('confirm-paid-fx').textContent = fxApprox(Number(totalPaidThb || 0));
     $('confirm-sub').textContent = sessions.length > 1
       ? `A confirmation just went to ${email} — all ${sessions.length} sessions are booked.`
       : `A confirmation just went to ${email}.`;
@@ -533,6 +544,7 @@
     $('confirm-paid').textContent = o.totalPaidThb != null
       ? '฿' + Number(o.totalPaidThb).toLocaleString('en-US')
       : '';
+    $('confirm-paid-fx').textContent = o.totalPaidThb != null ? fxApprox(Number(o.totalPaidThb)) : '';
     $('confirm-sub').textContent = o.email
       ? `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in ${o.email} within a few minutes.`
       : `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in your inbox within a few minutes.`;
@@ -548,6 +560,7 @@
     $('confirm-badge').textContent = 'Could not confirm automatically';
     $('confirm-name').textContent = '';
     $('confirm-paid').textContent = '';
+    $('confirm-paid-fx').textContent = '';
     $('confirm-sub').textContent = message;
     $('confirm-sessions-list').innerHTML = '';
     goStep(3);
