@@ -46,10 +46,7 @@
     $('qty-total-fx').textContent = fxApprox(total);
     $('qty-minus').disabled = state.quantity <= QTY_MIN;
     $('qty-plus').disabled = state.quantity >= QTY_MAX;
-    $('qty-note').hidden = state.quantity <= 1;
-    if (state.quantity > 1) {
-      $('qty-note').textContent = `Still ฿750 per session — no discount for booking more, just one less thing to schedule later. Pick a day and time for each of your ${state.quantity} sessions right here, before you pay; every one lands on your calendar with its own call link, ready when you are.`;
-    }
+    $('qty-note').textContent = `Want more than one session? Tap the +.`;
   }
 
   async function releaseHold(availabilityId) {
