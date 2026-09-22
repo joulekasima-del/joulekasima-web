@@ -47,8 +47,8 @@
     $('qty-minus').disabled = state.quantity <= QTY_MIN;
     $('qty-plus').disabled = state.quantity >= QTY_MAX;
     $('qty-note').textContent = state.quantity > 1
-      ? `฿750 per session, flat — no discount for booking more, just less to arrange later. You'll pick a day and time for each of the ${state.quantity} sessions right here, before you pay — every one lands on the calendar with its own Meet link, nothing to come back and redeem.`
-      : `฿750 per session, flat. Want more than one? Use the + above — you'll pick a time for each one before paying.`;
+      ? `Still ฿750 per session — no discount for booking more, just one less thing to schedule later. Pick a day and time for each of your ${state.quantity} sessions right here, before you pay; every one lands on your calendar with its own call link, ready when you are.`
+      : `฿750 flat, every session. Thinking about booking more than one? Tap the + and you'll pick a time for each — nothing to arrange again later.`;
   }
 
   async function releaseHold(availabilityId) {
