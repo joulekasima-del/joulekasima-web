@@ -16,14 +16,46 @@ primaryNav.querySelectorAll('a').forEach(link => {
   });
 });
 
-/* ---------- Contact form (demo) ---------- */
+/* ---------- Contact form ---------- */
 const form = document.getElementById('contactForm');
 const formNote = document.getElementById('formNote');
+const formButton = form.querySelector('button[type="submit"]');
+const formButtonLabel = formButton.textContent;
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  formNote.hidden = false;
-  form.reset();
+  const name = form.name.value.trim();
+  const email = form.email.value.trim();
+  const message = form.message.value.trim();
+  const website = form.website.value.trim();
+
+  formNote.hidden = true;
+  formNote.classList.remove('success', 'error');
+  formButton.disabled = true;
+  formButton.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message, website }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+
+    formNote.textContent = "Thanks — your message is on its way to me. I read every one and will reply soon.";
+    formNote.classList.add('success');
+    formNote.hidden = false;
+    form.reset();
+  } catch (err) {
+    formNote.innerHTML = 'Something went wrong sending that. Please try again, or email me at <a href="mailto:hello@joulekasima.com">hello@joulekasima.com</a>.';
+    formNote.classList.add('error');
+    formNote.hidden = false;
+    // Deliberately not calling form.reset() here — keep what they typed.
+  } finally {
+    formButton.disabled = false;
+    formButton.textContent = formButtonLabel;
+  }
 });
 
 /* ---------- Thai Talk Breaks launch notify ---------- */
