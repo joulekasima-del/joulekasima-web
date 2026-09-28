@@ -185,8 +185,7 @@ h1, h2, h3 {
 
 .hero-kicker,
 .hero-headline,
-.hero-sub,
-.hero-actions {
+.hero-sub {
   position: relative;
   z-index: 1;
 }
@@ -228,8 +227,6 @@ h1, h2, h3 {
   margin: 0 0 36px;
 }
 
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-
 .btn {
   display: inline-block;
   padding: 13px 24px;
@@ -261,7 +258,6 @@ h1, h2, h3 {
   padding-top: 40px;
 }
 .intro h2 { font-size: 28px; margin-bottom: 16px; }
-.intro-text { color: var(--graphite); margin: 0; max-width: 620px; }
 
 /* Tracks */
 .tracks {
