@@ -151,18 +151,22 @@
     <form class="contact-form" id="contactForm">
       <div class="form-row">
         <label for="name">Name</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" maxlength="100" required>
       </div>
       <div class="form-row">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" maxlength="254" required>
       </div>
       <div class="form-row">
         <label for="message">What's on your mind</label>
-        <textarea id="message" name="message" rows="4" required></textarea>
+        <textarea id="message" name="message" rows="4" maxlength="5000" required></textarea>
+      </div>
+      <div class="form-honeypot" aria-hidden="true">
+        <label for="website">Leave this field blank</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
       </div>
       <button type="submit" class="btn btn-primary">Send message</button>
-      <p class="form-note" id="formNote" hidden>Thanks — this is a demo form. Connect it to Formspree, Resend, or a similar service before launch.</p>
+      <p class="form-note" id="formNote" role="status" aria-live="polite" hidden></p>
     </form>
   </section>
 
