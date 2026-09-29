@@ -1,20 +1,16 @@
 (function () {
   const $ = (id) => document.getElementById(id);
 
+  // Price, currency and the per-purchase cap all come from /still.config.js;
+  // formatting from /assets/shared.js. The server (create-payment-intent /
+  // finalize) is authoritative for what's actually charged — this page only
+  // previews it until the server's own total comes back.
+  const CFG = StillConfig.session;
   const QTY_MIN = 1;
-  const QTY_MAX = 10;
-  const PRICE_PER_SESSION = 750;
-
-  // Reference-only conversion — participants are always charged in THB.
-  // Rates are a fixed approximation (not live), so they're clearly framed
-  // as "≈" and periodically worth a manual refresh against current FX.
-  const THB_PER_USD = 32.6;
-  const EUR_PER_USD = 0.92;
-  function fxApprox(totalThb) {
-    const usd = Math.round(totalThb / THB_PER_USD);
-    const eur = Math.round(usd * EUR_PER_USD);
-    return `≈ $${usd} USD / €${eur} EUR`;
-  }
+  const QTY_MAX = CFG.maxSessionsPerPurchase;
+  const money = (amount) => Shared.formatMoney(amount, CFG.currency);
+  const chargedIn = `Charged in ${CFG.currency}`;
+  $('policy-text').textContent = Shared.policyText(StillConfig.policy) + ' Cancelling one session never affects the others in the same purchase.';
 
   let stripe = null;
   let elements = null;
@@ -34,16 +30,17 @@
     holdInterval: null,
     holdDeadline: null,
     paymentIntentId: null,
+    totalDisplay: null,
     fname: '', lname: '', email: '',
   };
 
   // ---------- Quantity selector ----------
   function renderQty() {
     $('qty-value').textContent = state.quantity;
-    const total = state.quantity * PRICE_PER_SESSION;
-    $('qty-total-thb').textContent = '฿' + total.toLocaleString('en-US');
-    $('qty-breakdown').textContent = state.quantity + ' session' + (state.quantity > 1 ? 's' : '') + ' × ฿750';
-    $('qty-total-fx').textContent = fxApprox(total);
+    const total = state.quantity * CFG.price;
+    $('qty-total-thb').textContent = money(total);
+    $('qty-breakdown').textContent = state.quantity + ' session' + (state.quantity > 1 ? 's' : '') + ' × ' + money(CFG.price);
+    $('qty-total-fx').textContent = chargedIn;
     $('qty-minus').disabled = state.quantity <= QTY_MIN;
     $('qty-plus').disabled = state.quantity >= QTY_MAX;
     $('qty-note').textContent = `Want more than one session? Tap the +.`;
@@ -348,10 +345,11 @@
       });
       $('summary-name').textContent = `${state.fname} ${state.lname}`;
 
-      const totalThb = state.quantity * PRICE_PER_SESSION;
       $('summary-plan').textContent = state.quantity === 1 ? 'Single session' : `${state.quantity} sessions, all scheduled now`;
-      $('price-thb').textContent = '฿' + totalThb.toLocaleString('en-US');
-      $('price-usd').textContent = `${fxApprox(totalThb)} — charged in THB`;
+      // Provisional (config-based) until create-payment-intent returns the
+      // server's authoritative total_display, which replaces this below.
+      $('price-thb').textContent = money(state.quantity * CFG.price);
+      $('price-usd').textContent = chargedIn;
       $('price-tag').textContent = state.quantity === 1 ? '1 session' : `${state.quantity} sessions`;
 
       await setupPaymentIntent();
@@ -399,6 +397,8 @@
       return;
     }
     state.paymentIntentId = data.payment_intent_id;
+    state.totalDisplay = data.total_display;
+    $('price-thb').textContent = data.total_display;
     elements = stripe.elements({ clientSecret: data.client_secret });
     const paymentElement = elements.create('payment');
     paymentElement.mount('#payment-element');
@@ -467,7 +467,7 @@
         showPendingConfirmation({
           name: `${state.fname} ${state.lname}`,
           email: state.email,
-          totalPaidThb: state.pickedSessions.length * PRICE_PER_SESSION,
+          totalPaidDisplay: state.totalDisplay,
         });
         return;
       }
@@ -489,7 +489,7 @@
       showConfirmation({
         name: `${data.first_name} ${data.last_name}`,
         email: data.email,
-        totalPaidThb: data.total_paid_thb,
+        totalPaidDisplay: data.total_paid_display,
         sessions: data.sessions,
       });
     } catch (err) {
@@ -501,11 +501,10 @@
     }
   });
 
-  function showConfirmation({ name, email, totalPaidThb, sessions }) {
+  function showConfirmation({ name, email, totalPaidDisplay, sessions }) {
     $('confirm-badge').innerHTML = '&#10003; Booking confirmed';
     $('confirm-name').textContent = name;
-    $('confirm-paid').textContent = '฿' + Number(totalPaidThb || 0).toLocaleString('en-US');
-    $('confirm-paid-fx').textContent = fxApprox(Number(totalPaidThb || 0));
+    $('confirm-paid').textContent = totalPaidDisplay || '';
     $('confirm-sub').textContent = sessions.length > 1
       ? `A confirmation just went to ${email} — all ${sessions.length} sessions are booked.`
       : `A confirmation just went to ${email}.`;
@@ -539,10 +538,7 @@
     const o = opts || {};
     $('confirm-badge').textContent = 'Payment received';
     $('confirm-name').textContent = o.name || '';
-    $('confirm-paid').textContent = o.totalPaidThb != null
-      ? '฿' + Number(o.totalPaidThb).toLocaleString('en-US')
-      : '';
-    $('confirm-paid-fx').textContent = o.totalPaidThb != null ? fxApprox(Number(o.totalPaidThb)) : '';
+    $('confirm-paid').textContent = o.totalPaidDisplay || '';
     $('confirm-sub').textContent = o.email
       ? `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in ${o.email} within a few minutes.`
       : `Got it — your payment is finishing processing. Your booking confirmation and calendar link will land in your inbox within a few minutes.`;
@@ -558,7 +554,6 @@
     $('confirm-badge').textContent = 'Could not confirm automatically';
     $('confirm-name').textContent = '';
     $('confirm-paid').textContent = '';
-    $('confirm-paid-fx').textContent = '';
     $('confirm-sub').textContent = message;
     $('confirm-sessions-list').innerHTML = '';
     goStep(3);
@@ -603,7 +598,7 @@
         showConfirmation({
           name: `${data.first_name} ${data.last_name}`,
           email: data.email,
-          totalPaidThb: data.total_paid_thb,
+          totalPaidDisplay: data.total_paid_display,
           sessions: data.sessions,
         });
         return;
@@ -636,6 +631,7 @@
     state.pickedSessions = [];
     state.holdToken = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
     state.paymentIntentId = null;
+    state.totalDisplay = null;
     state.monthCache = {};
     viewYear = TODAY.getFullYear();
     viewMonth = TODAY.getMonth();

@@ -43,9 +43,7 @@
 
       <div class="banner banner-warn" id="d-preview">—</div>
 
-      <div class="policy-box" id="d-policy">
-        Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. Any other sessions from the same purchase are untouched.
-      </div>
+      <div class="policy-box" id="d-policy"></div>
 
       <div class="action-row" id="d-actions" style="justify-content: flex-start; gap: 14px;">
         <button class="book-btn" id="confirm-cancel">Cancel this booking</button>
@@ -63,9 +61,12 @@
   </div>
 </main>
 
+<script src="/still.config.js"></script>
+<script src="/assets/shared.js"></script>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
+  $('d-policy').textContent = Shared.policyText(StillConfig.policy) + ' Any other sessions from the same purchase are untouched.';
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
   const token = params.get('token');
@@ -116,9 +117,9 @@
           const result = await res.json();
           if (!res.ok) throw new Error(result.error || 'Could not cancel this booking.');
 
-          const text = result.refund_thb > 0
-            ? `Your booking is cancelled. ฿${result.refund_thb} is being refunded to your card. Any other sessions from the same purchase are untouched.`
-            : 'Your booking is cancelled. Since it was under 24 hours notice, no refund applies. Any other sessions from the same purchase are untouched.';
+          const text = result.refund_minor > 0
+            ? `Your booking is cancelled. ${result.refund_display} is being refunded to your card. Any other sessions from the same purchase are untouched.`
+            : 'Your booking is cancelled. Since it was outside the refund window, no refund applies. Any other sessions from the same purchase are untouched.';
           $('done-text').textContent = text;
           show('done');
         } catch (err) {

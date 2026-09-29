@@ -1,4 +1,7 @@
 const { getSupabase } = require('../../lib/supabase');
+const cfg = require('../../lib/config');
+const shared = require('../../assets/shared');
+const { bookingAmountMinor, bookingCurrency } = require('../../lib/booking-money');
 
 function hoursUntil(date, startTime) {
   const sessionStart = new Date(`${date}T${startTime}+07:00`);
@@ -23,7 +26,7 @@ module.exports = async (req, res) => {
     const supabase = getSupabase();
     const { data: booking, error } = await supabase
       .from('bookings')
-      .select('reference, first_name, status, amount_paid_thb, cancel_token, availability:availability_id(date, start_time)')
+      .select('reference, first_name, status, amount_paid_minor, amount_paid_thb, currency, cancel_token, availability:availability_id(date, start_time)')
       .eq('reference', ref)
       .single();
     if (error || !booking || booking.cancel_token !== token) {
@@ -37,10 +40,25 @@ module.exports = async (req, res) => {
     if (booking.status !== 'confirmed') {
       preview = { text: `This booking is already ${booking.status}.`, actionable: false };
     } else {
-      const paid = booking.amount_paid_thb || 0;
-      if (hours >= 48) preview = { text: `Cancelling now refunds ฿${paid} in full (48+ hours notice).`, actionable: true };
-      else if (hours >= 24) preview = { text: `Cancelling now refunds ฿${Math.round(paid / 2)} (50%, 24–48 hours notice).`, actionable: true };
-      else preview = { text: "Cancelling now gives no refund — it's under 24 hours before the session.", actionable: true };
+      // Same tier logic as cancel.js (shared.refundPercent), and the booking's
+      // OWN stored amount + currency, so old THB bookings preview in THB.
+      const paidMinor = bookingAmountMinor(booking);
+      const currency = bookingCurrency(booking);
+      const pct = shared.refundPercent(hours, cfg.policy);
+      const refundMinor = Math.round(paidMinor * pct / 100);
+      const tiers = [...cfg.policy.refundTiers].sort((a, b) => b.hoursBefore - a.hoursBefore);
+      const tierIdx = tiers.findIndex((t) => hours >= t.hoursBefore);
+      const tier = tiers[tierIdx];
+      const upper = tierIdx > 0 ? tiers[tierIdx - 1].hoursBefore : null;
+      const money = shared.formatMinor(refundMinor, currency);
+      if (!tier || refundMinor === 0) {
+        const floor = tiers.length ? tiers[tiers.length - 1].hoursBefore : 0;
+        preview = { text: `Cancelling now gives no refund — it's under ${floor} hours before the session.`, actionable: true };
+      } else if (pct >= 100) {
+        preview = { text: `Cancelling now refunds ${money} in full (${tier.hoursBefore}+ hours notice).`, actionable: true };
+      } else {
+        preview = { text: `Cancelling now refunds ${money} (${pct}%, ${upper ? `${tier.hoursBefore}–${upper}` : `${tier.hoursBefore}+`} hours notice).`, actionable: true };
+      }
     }
 
     res.status(200).json({

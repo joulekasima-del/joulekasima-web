@@ -104,7 +104,7 @@
       </div>
       <div class="still-details-row">
         <span class="label">price</span>
-        <span class="value">฿750 / session</span>
+        <span class="value" id="session-price">—</span>
       </div>
     </div>
     <a class="still-btn-outline" href="/still/book"><span class="chevron">&gt;</span> Book a session</a>
@@ -153,6 +153,9 @@
   </div>
 </footer>
 
+<script src="/still.config.js"></script>
+<script src="/assets/shared.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script>document.getElementById('session-price').textContent = Shared.formatMoney(StillConfig.session.price, StillConfig.session.currency) + ' / session';</script>
 </body>
 </html>

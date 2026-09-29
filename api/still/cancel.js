@@ -3,6 +3,9 @@ const { getStripe } = require('../../lib/stripe');
 const { deleteBookingEvent } = require('../../lib/google-calendar');
 const { getResend, FROM } = require('../../lib/resend');
 const { cancellationEmail } = require('../../lib/emails/templates');
+const cfg = require('../../lib/config');
+const shared = require('../../assets/shared');
+const { bookingAmountMinor, bookingCurrency } = require('../../lib/booking-money');
 
 function hoursUntil(date, startTime) {
   const sessionStart = new Date(`${date}T${startTime}+07:00`);
@@ -10,7 +13,8 @@ function hoursUntil(date, startTime) {
 }
 
 // Cancels exactly ONE session (one booking row). Uniform cash tiers apply to
-// every session, always against its own ฿750 share — refunded as a partial
+// every session, always against its own stored share (amount_paid_minor, in
+// the booking's own currency) — refunded as a partial
 // Stripe refund against the shared purchase payment_intent. Cancelling one
 // session never touches the others from the same purchase.
 module.exports = async (req, res) => {
@@ -45,18 +49,19 @@ module.exports = async (req, res) => {
     }
 
     const hours = hoursUntil(booking.availability.date, booking.availability.start_time);
-    const paid = booking.amount_paid_thb || 0;
+    // The booking's OWN stored amount and currency — not cfg.currency — so an
+    // older THB booking still refunds correctly in THB after the config moves on.
+    const paidMinor = bookingAmountMinor(booking);
+    const currency = bookingCurrency(booking);
+    const pct = shared.refundPercent(hours, cfg.policy);
+    const refundMinor = Math.round(paidMinor * pct / 100);
 
-    let refundThb = 0;
-    if (hours >= 48) refundThb = paid;
-    else if (hours >= 24) refundThb = Math.round(paid / 2);
-    else refundThb = 0;
-
-    if (refundThb > 0 && booking.stripe_payment_intent_id) {
+    if (refundMinor > 0 && booking.stripe_payment_intent_id) {
       const stripe = getStripe();
+      // No currency param: Stripe refunds in the original PaymentIntent's currency.
       const refund = await stripe.refunds.create({
         payment_intent: booking.stripe_payment_intent_id,
-        amount: refundThb * 100,
+        amount: refundMinor,
       });
       await supabase.from('bookings').update({ stripe_refund_id: refund.id }).eq('id', booking.id);
     }
@@ -72,20 +77,21 @@ module.exports = async (req, res) => {
       .from('bookings')
       .update({
         status: 'cancelled_by_participant',
-        refund_amount_thb: refundThb,
+        refund_amount_minor: refundMinor,
       })
       .eq('id', booking.id);
 
-    const emailBooking = { ...booking, date: booking.availability.date, start_time: booking.availability.start_time };
+    const emailBooking = { ...booking, currency, date: booking.availability.date, start_time: booking.availability.start_time };
     const resend = getResend();
-    const template = cancellationEmail(emailBooking, refundThb);
+    const template = cancellationEmail(emailBooking, refundMinor);
     await resend.emails.send({ from: FROM, to: booking.email, subject: template.subject, html: template.html }).catch((e) =>
       console.error('Failed to send cancellation email', e)
     );
 
     res.status(200).json({
       ok: true,
-      refund_thb: refundThb,
+      refund_minor: refundMinor,
+      refund_display: refundMinor > 0 ? shared.formatMinor(refundMinor, currency) : null,
     });
   } catch (err) {
     console.error('still/cancel error', err);
