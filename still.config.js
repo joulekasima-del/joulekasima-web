@@ -1,7 +1,8 @@
 (function (root) {
   const config = {
     session: {
-      price: 25,           // whole currency units — see note below before ever changing this
+      // TEMPORARY: set to $1 for a live real-card test. REVERT TO 25 afterward.
+      price: 1,            // whole currency units — see note below before ever changing this
       currency: 'USD',
       maxSessionsPerPurchase: 10,
     },
