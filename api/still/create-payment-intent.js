@@ -97,6 +97,7 @@ module.exports = async (req, res) => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalMinor,
       currency: currency.toLowerCase(),
+      payment_method_types: ['card'], // cards only (Apple Pay / Google Pay still work through card); no async methods like PromptPay
       receipt_email: email,
       metadata: { quantity: String(availability_ids.length), hold_token, currency },
     });
