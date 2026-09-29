@@ -8,8 +8,13 @@
   const CFG = StillConfig.session;
   const QTY_MIN = 1;
   const QTY_MAX = CFG.maxSessionsPerPurchase;
-  const money = (amount) => Shared.formatMoney(amount, CFG.currency);
-  const chargedIn = `Charged in ${CFG.currency}`;
+  const CURRENCIES = Object.keys(CFG.prices).map((c) => c.toUpperCase());
+  const priceOf = (cur) => CFG.prices[Object.keys(CFG.prices).find((k) => k.toUpperCase() === cur)];
+  // The visitor's chosen currency lives in state.currency; it starts as the
+  // suggestion from /api/still/config (Thailand -> THB, else the default) and
+  // can be switched on the payment step. Formatting is always Shared.formatMoney.
+  const money = (amount, cur) => Shared.formatMoney(amount, cur || state.currency);
+  const chargedIn = () => `Charged in ${state.currency}`;
   $('policy-text').textContent = Shared.policyText(StillConfig.policy) + ' Cancelling one session never affects the others in the same purchase.';
 
   let stripe = null;
@@ -18,8 +23,11 @@
     .then((r) => r.json())
     .then((cfg) => {
       if (cfg.stripe_publishable_key) stripe = Stripe(cfg.stripe_publishable_key);
+      const suggested = String(cfg.suggested_currency || '').toUpperCase();
+      if (CURRENCIES.includes(suggested)) state.currency = suggested;
     })
-    .catch(() => {});
+    .catch(() => {})
+    .then(() => { state.currencyKnown = true; renderQty(); });
 
   const state = {
     quantity: 1,
@@ -31,16 +39,21 @@
     holdDeadline: null,
     paymentIntentId: null,
     totalDisplay: null,
+    currency: String(CFG.defaultCurrency).toUpperCase(),
+    currencyKnown: false, // price text stays blank until the suggested currency is known (no flash of the wrong one)
+    switching: false,
     fname: '', lname: '', email: '',
   };
 
   // ---------- Quantity selector ----------
   function renderQty() {
     $('qty-value').textContent = state.quantity;
-    const total = state.quantity * CFG.price;
-    $('qty-total-thb').textContent = money(total);
-    $('qty-breakdown').textContent = state.quantity + ' session' + (state.quantity > 1 ? 's' : '') + ' × ' + money(CFG.price);
-    $('qty-total-fx').textContent = chargedIn;
+    if (state.currencyKnown) {
+      const total = state.quantity * priceOf(state.currency);
+      $('qty-total-thb').textContent = money(total);
+      $('qty-breakdown').textContent = state.quantity + ' session' + (state.quantity > 1 ? 's' : '') + ' × ' + money(priceOf(state.currency));
+      $('qty-total-fx').textContent = chargedIn();
+    }
     $('qty-minus').disabled = state.quantity <= QTY_MIN;
     $('qty-plus').disabled = state.quantity >= QTY_MAX;
     $('qty-note').textContent = `Want more than one session? Tap the +.`;
@@ -348,8 +361,7 @@
       $('summary-plan').textContent = state.quantity === 1 ? 'Single session' : `${state.quantity} sessions, all scheduled now`;
       // Provisional (config-based) until create-payment-intent returns the
       // server's authoritative total_display, which replaces this below.
-      $('price-thb').textContent = money(state.quantity * CFG.price);
-      $('price-usd').textContent = chargedIn;
+      renderPaymentPrice(money(state.quantity * priceOf(state.currency)));
       $('price-tag').textContent = state.quantity === 1 ? '1 session' : `${state.quantity} sessions`;
 
       await setupPaymentIntent();
@@ -369,8 +381,27 @@
     }
   });
 
+  // Price block on the payment step: amount, "Charged in X", and a link to
+  // switch to the other currency (only shown when there is another one).
+  function renderPaymentPrice(amountText) {
+    $('price-thb').textContent = amountText;
+    $('price-usd').textContent = chargedIn();
+    const other = CURRENCIES.find((c) => c !== state.currency);
+    const toggle = $('currency-toggle');
+    toggle.hidden = !other;
+    if (other) toggle.textContent = `Pay in ${other} instead`;
+  }
+
+  let paymentElement = null;
+
+  // Creates a fresh PaymentIntent for state.currency and mounts its payment
+  // form. A PaymentIntent's currency can't change, so switching currency (or
+  // going back and continuing again) calls this again; the server retires the
+  // old unpaid PaymentIntent and replaces its pending booking rows.
   async function setupPaymentIntent() {
     await stripeReady;
+    if (paymentElement) { paymentElement.destroy(); paymentElement = null; elements = null; }
+    $('payment-error').hidden = true;
     if (!stripe) {
       $('payment-error').hidden = false;
       $('payment-error').textContent = 'Payments are not configured yet on this site.';
@@ -388,6 +419,7 @@
         phone: $('phone').value.trim(),
         notes: $('notes').value.trim(),
         newsletter_opt_in: $('newsletter').checked,
+        currency: state.currency,
       }),
     });
     const data = await r.json();
@@ -396,13 +428,38 @@
       $('payment-error').textContent = data.error || 'Could not start payment.';
       return;
     }
+    // The server's currency and total are authoritative for what will be charged.
+    state.currency = String(data.currency || state.currency).toUpperCase();
     state.paymentIntentId = data.payment_intent_id;
     state.totalDisplay = data.total_display;
-    $('price-thb').textContent = data.total_display;
+    renderPaymentPrice(data.total_display);
     elements = stripe.elements({ clientSecret: data.client_secret });
-    const paymentElement = elements.create('payment');
+    paymentElement = elements.create('payment');
     paymentElement.mount('#payment-element');
   }
+
+  // The switch is a text link, not a button, so "disabled" is aria-disabled + CSS.
+  const setToggleBusy = (busy) => $('currency-toggle').setAttribute('aria-disabled', busy ? 'true' : 'false');
+
+  $('currency-toggle').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const other = CURRENCIES.find((c) => c !== state.currency);
+    if (!other || state.switching) return;
+    state.switching = true;
+    setToggleBusy(true);
+    $('to-confirm').disabled = true;
+    state.currency = other;
+    renderPaymentPrice(money(state.quantity * priceOf(other)));
+    renderQty();
+    try {
+      await setupPaymentIntent();
+    } finally {
+      state.switching = false;
+      setToggleBusy(false);
+      // Only re-enable Pay if the slot holds haven't run out in the meantime.
+      if (state.holdDeadline && state.holdDeadline > Date.now()) $('to-confirm').disabled = false;
+    }
+  });
 
   // ---------- Slot hold countdown ----------
   function startHold(deadlineMs) {
@@ -441,6 +498,7 @@
     const label = $('to-confirm-label');
     if (btn.disabled) return;
     btn.disabled = true;
+    setToggleBusy(true);
     const originalLabel = label.textContent;
     label.textContent = 'Processing…';
     $('payment-error').hidden = true;
@@ -497,6 +555,7 @@
       $('payment-error').textContent = err.message;
     } finally {
       btn.disabled = false;
+      setToggleBusy(false);
       label.textContent = originalLabel;
     }
   });

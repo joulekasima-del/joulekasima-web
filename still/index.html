@@ -104,7 +104,7 @@
       </div>
       <div class="still-details-row">
         <span class="label">price</span>
-        <span class="value" id="session-price">—</span>
+        <span class="value" id="session-price" style="visibility:hidden">$25.00 / session</span>
       </div>
     </div>
     <a class="still-btn-outline" href="/still/book"><span class="chevron">&gt;</span> Book a session</a>
@@ -156,6 +156,24 @@
 <script src="/still.config.js"></script>
 <script src="/assets/shared.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-<script>document.getElementById('session-price').textContent = Shared.formatMoney(StillConfig.session.price, StillConfig.session.currency) + ' / session';</script>
+<script>
+// One price, in the visitor's suggested currency (Thailand -> THB, else USD),
+// from /api/still/config. The row is laid out (but invisible) from the start
+// so nothing jumps, and the price only appears once the answer is known.
+(function () {
+  var el = document.getElementById('session-price');
+  var prices = StillConfig.session.prices;
+  function show(cur) {
+    var key = Object.keys(prices).filter(function (k) { return k.toUpperCase() === String(cur).toUpperCase(); })[0]
+      || StillConfig.session.defaultCurrency;
+    el.textContent = Shared.formatMoney(prices[key] !== undefined ? prices[key] : prices[StillConfig.session.defaultCurrency], key) + ' / session';
+    el.style.visibility = 'visible';
+  }
+  fetch('/api/still/config')
+    .then(function (r) { return r.json(); })
+    .then(function (c) { show(c.suggested_currency || StillConfig.session.defaultCurrency); })
+    .catch(function () { show(StillConfig.session.defaultCurrency); });
+})();
+</script>
 </body>
 </html>
