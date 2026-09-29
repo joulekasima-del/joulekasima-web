@@ -18,6 +18,7 @@ module.exports = async (req, res) => {
       phone,
       notes,
       newsletter_opt_in,
+      currency: requestedCurrency, // optional; validated against the config's allowed list
     } = req.body || {};
 
     if (!Array.isArray(availability_ids) || availability_ids.length === 0 || availability_ids.length > cfg.maxPerPurchase) {
@@ -34,6 +35,7 @@ module.exports = async (req, res) => {
     }
 
     const supabase = getSupabase();
+    const stripe = getStripe();
     const nowISO = new Date().toISOString();
 
     // Every picked slot must still be held by this same client, and not expired.
@@ -52,17 +54,51 @@ module.exports = async (req, res) => {
       }
     }
 
-    // Price and currency come from still.config.js (via lib/config), in minor
-    // units — never from the client.
-    const priceMinor = cfg.priceMinor;
+    // A client can only *pick* a currency from the config's allowed list
+    // (anything else falls back to the default). The price always comes from
+    // still.config.js via lib/config, in minor units — never from the client.
+    const currency = cfg.resolveCurrency(requestedCurrency);
+    const priceMinor = cfg.priceMinor(currency);
     const totalMinor = priceMinor * availability_ids.length;
 
-    const stripe = getStripe();
+    // This hold_token may already have an earlier, unpaid attempt (the buyer
+    // switched currency, or went back to details and continued again). A
+    // PaymentIntent's currency can't change, so retire the old attempt and
+    // replace its pending rows instead of leaving them double-counted.
+    // cancel() is the guard: it only succeeds while the PaymentIntent is still
+    // unpaid, so a payment that already went through is never replaced.
+    const { data: stale, error: staleErr } = await supabase
+      .from('bookings')
+      .select('id, stripe_payment_intent_id')
+      .eq('hold_token', hold_token)
+      .eq('status', 'pending');
+    if (staleErr) throw staleErr;
+    const stalePIs = [...new Set((stale || []).map((b) => b.stripe_payment_intent_id).filter(Boolean))];
+    for (const piId of stalePIs) {
+      try {
+        await stripe.paymentIntents.cancel(piId);
+      } catch (cancelErr) {
+        const existing = await stripe.paymentIntents.retrieve(piId).catch(() => null);
+        if (!existing || existing.status !== 'canceled') {
+          res.status(409).json({ error: 'A payment for these sessions is already in progress. Please refresh the page before trying again.' });
+          return;
+        }
+      }
+    }
+    if (stale && stale.length) {
+      const { error: delErr } = await supabase
+        .from('bookings')
+        .delete()
+        .in('id', stale.map((b) => b.id))
+        .eq('status', 'pending');
+      if (delErr) throw delErr;
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalMinor,
-      currency: cfg.currency.toLowerCase(),
+      currency: currency.toLowerCase(),
       receipt_email: email,
-      metadata: { quantity: String(availability_ids.length), hold_token },
+      metadata: { quantity: String(availability_ids.length), hold_token, currency },
     });
 
     const bookingsToInsert = availability_ids.map((availability_id) => ({
@@ -75,7 +111,7 @@ module.exports = async (req, res) => {
       notes: notes || null,
       status: 'pending',
       stripe_payment_intent_id: paymentIntent.id,
-      currency: cfg.currency,
+      currency,
       amount_paid_minor: priceMinor, // this one session's share; amount_paid_thb is no longer written
       hold_token,
       newsletter_opt_in: !!newsletter_opt_in,
@@ -93,7 +129,8 @@ module.exports = async (req, res) => {
       booking_ids: bookings.map((b) => b.id),
       references: bookings.map((b) => b.reference),
       total_minor: totalMinor,
-      total_display: cfg.formatMinor(totalMinor),
+      currency,
+      total_display: cfg.formatMinor(totalMinor, currency),
       quantity: availability_ids.length,
     });
   } catch (err) {
