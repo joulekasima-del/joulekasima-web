@@ -1,6 +1,8 @@
 (function (root) {
   const ZERO_DECIMAL = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
 
+  const WHOLE_WHEN_ROUND = ['THB'];
+
   function minorFactor(currency) {
     return ZERO_DECIMAL.includes(String(currency).toUpperCase()) ? 1 : 100;
   }
@@ -13,11 +15,16 @@
   function formatMoney(amount, currency) {
     if (amount === null || amount === undefined || amount === '' || !isFinite(Number(amount))) return String(amount);
     try {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: String(currency).toUpperCase(),
-        currencyDisplay: 'narrowSymbol',
-      }).format(Number(amount));
+      const cur = String(currency).toUpperCase();
+      const opts = { style: 'currency', currency: cur, currencyDisplay: 'narrowSymbol' };
+      // Baht is shown as whole baht (฿750) whenever the amount is a round number;
+      // an amount with satang (e.g. ฿375.50) still shows them. Other currencies
+      // (USD -> $25.00) keep their default digits.
+      if (WHOLE_WHEN_ROUND.includes(cur) && Number.isInteger(Number(amount))) {
+        opts.minimumFractionDigits = 0;
+        opts.maximumFractionDigits = 0;
+      }
+      return new Intl.NumberFormat('en-US', opts).format(Number(amount));
     } catch (e) {
       return `${amount} ${currency}`;
     }
