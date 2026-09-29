@@ -1,8 +1,7 @@
 const { getSupabase } = require('../../lib/supabase');
 const { getStripe } = require('../../lib/stripe');
 const { generateBookingReference } = require('../../lib/booking-ref');
-
-const QTY_MAX = 10;
+const cfg = require('../../lib/config');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -21,8 +20,12 @@ module.exports = async (req, res) => {
       newsletter_opt_in,
     } = req.body || {};
 
-    if (!Array.isArray(availability_ids) || availability_ids.length === 0 || availability_ids.length > QTY_MAX) {
-      res.status(400).json({ error: `Pick between 1 and ${QTY_MAX} sessions.` });
+    if (!Array.isArray(availability_ids) || availability_ids.length === 0 || availability_ids.length > cfg.maxPerPurchase) {
+      res.status(400).json({ error: `Pick between 1 and ${cfg.maxPerPurchase} sessions.` });
+      return;
+    }
+    if (new Set(availability_ids).size !== availability_ids.length) {
+      res.status(400).json({ error: 'Each session must be a different time slot.' });
       return;
     }
     if (!hold_token || !first_name || !last_name || !email) {
@@ -49,14 +52,15 @@ module.exports = async (req, res) => {
       }
     }
 
-    const { data: session } = await supabase.from('sessions').select('*').limit(1).single();
-    const pricePerSession = session.price_per_session_thb;
-    const totalThb = pricePerSession * availability_ids.length;
+    // Price and currency come from still.config.js (via lib/config), in minor
+    // units — never from the client.
+    const priceMinor = cfg.priceMinor;
+    const totalMinor = priceMinor * availability_ids.length;
 
     const stripe = getStripe();
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalThb * 100, // THB minor unit (satang)
-      currency: 'thb',
+      amount: totalMinor,
+      currency: cfg.currency.toLowerCase(),
       receipt_email: email,
       metadata: { quantity: String(availability_ids.length), hold_token },
     });
@@ -71,7 +75,8 @@ module.exports = async (req, res) => {
       notes: notes || null,
       status: 'pending',
       stripe_payment_intent_id: paymentIntent.id,
-      amount_paid_thb: pricePerSession,
+      currency: cfg.currency,
+      amount_paid_minor: priceMinor, // this one session's share; amount_paid_thb is no longer written
       hold_token,
       newsletter_opt_in: !!newsletter_opt_in,
     }));
@@ -87,7 +92,8 @@ module.exports = async (req, res) => {
       payment_intent_id: paymentIntent.id,
       booking_ids: bookings.map((b) => b.id),
       references: bookings.map((b) => b.reference),
-      total_thb: totalThb,
+      total_minor: totalMinor,
+      total_display: cfg.formatMinor(totalMinor),
       quantity: availability_ids.length,
     });
   } catch (err) {

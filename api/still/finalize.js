@@ -1,5 +1,7 @@
 const { getStripe } = require('../../lib/stripe');
 const { finalizePurchase } = require('../../lib/finalize-booking');
+const shared = require('../../assets/shared');
+const { bookingAmountMinor, bookingCurrency } = require('../../lib/booking-money');
 
 // Called by the client right after stripe.confirmPayment() resolves, so the
 // participant sees their confirmation instantly instead of waiting on the
@@ -29,12 +31,20 @@ module.exports = async (req, res) => {
 
     const confirmed = await finalizePurchase(payment_intent_id);
     const first = confirmed[0];
+    // One purchase = one PaymentIntent = one currency. If that ever isn't
+    // true, log it and format in the first booking's currency.
+    const currency = bookingCurrency(first);
+    if (confirmed.some((b) => bookingCurrency(b) !== currency)) {
+      console.warn('still/finalize: mixed currencies in one purchase', payment_intent_id);
+    }
+    const totalMinor = confirmed.reduce((sum, b) => sum + bookingAmountMinor(b), 0);
     res.status(200).json({
       ok: true,
       first_name: first.first_name,
       last_name: first.last_name,
       email: first.email,
-      total_paid_thb: confirmed.reduce((sum, b) => sum + (b.amount_paid_thb || 0), 0),
+      total_paid_minor: totalMinor,
+      total_paid_display: shared.formatMinor(totalMinor, currency),
       sessions: confirmed.map((b) => ({
         reference: b.reference,
         call_link: b.call_link,
