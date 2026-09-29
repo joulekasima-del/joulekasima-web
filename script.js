@@ -35,10 +35,10 @@ form.addEventListener('submit', async (e) => {
   formButton.textContent = 'Sending…';
 
   try {
-    const res = await fetch('/api/contact', {
+    const res = await fetch('/api/forms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message, website }),
+      body: JSON.stringify({ formType: 'contact', name, email, message, website }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Something went wrong.');
@@ -75,10 +75,10 @@ if (notifyForm) {
     notifyButton.textContent = 'Sending…';
 
     try {
-      const res = await fetch('/api/thai-talk-notify', {
+      const res = await fetch('/api/forms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ formType: 'thai-talk-notify', email }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Something went wrong.');
