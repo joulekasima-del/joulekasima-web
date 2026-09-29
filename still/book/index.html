@@ -44,9 +44,9 @@
             <button class="qty-btn" id="qty-plus" type="button" aria-label="Increase quantity">+</button>
           </div>
           <div class="qty-total">
-            <div class="amount" id="qty-total-thb">฿750</div>
-            <div class="breakdown" id="qty-breakdown">1 session &times; ฿750</div>
-            <div class="fx-line" id="qty-total-fx" title="Approximate — you're charged in Thai baht"></div>
+            <div class="amount" id="qty-total-thb"></div>
+            <div class="breakdown" id="qty-breakdown"></div>
+            <div class="fx-line" id="qty-total-fx"></div>
           </div>
         </div>
         <p class="qty-note" id="qty-note">Want more than one session? Tap the +.</p>
@@ -127,7 +127,7 @@
       <h2 class="block-title">&gt; price</h2>
       <div class="price-block">
         <div>
-          <div class="thb" id="price-thb">฿750</div>
+          <div class="thb" id="price-thb"></div>
           <div class="usd" id="price-usd">—</div>
         </div>
         <div class="ptag" id="price-tag">1 session</div>
@@ -139,9 +139,7 @@
       </div>
       <p class="field-error" id="payment-error" hidden></p>
 
-      <div class="policy-box">
-        Full refund 48+ hours before. 50% refund 24–48 hours before. No refund under 24 hours. If I have to cancel, you're always fully refunded. Cancelling one session never affects the others in the same purchase.
-      </div>
+      <div class="policy-box" id="policy-text"></div>
 
       <div class="checkbox-row">
         <input type="checkbox" id="newsletter">
@@ -163,9 +161,8 @@
       <div class="book-panel">
         <div class="summary-row"><span class="label">session type</span><span class="value">Still — 1:1 guided meditation, 30 min</span></div>
         <div class="summary-row"><span class="label">booked for</span><span class="value" id="confirm-name">—</span></div>
-        <div class="summary-row"><span class="label">total paid</span><span class="value" id="confirm-paid">฿750</span></div>
+        <div class="summary-row"><span class="label">total paid</span><span class="value" id="confirm-paid"></span></div>
       </div>
-      <p class="fx-line" id="confirm-paid-fx" style="text-align:right; margin: -18px 0 20px;" title="Approximate — you were charged in Thai baht"></p>
 
       <div id="confirm-sessions-list"></div>
 
@@ -184,6 +181,8 @@
 </footer>
 
 <script src="https://js.stripe.com/v3/"></script>
+<script src="/still.config.js"></script>
+<script src="/assets/shared.js"></script>
 <script src="/still/book/book.js"></script>
 </body>
 </html>
