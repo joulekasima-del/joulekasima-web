@@ -804,6 +804,8 @@ section[hidden] { display: none !important; }
 .still-details-row .label { font-family: var(--font-mono); font-size: 13px; color: var(--ink-faint); }
 .still-details-row .value { font-size: 15.5px; text-align: right; font-weight: 500; }
 
+.still-details-panel + .still-btn-outline { margin-top: var(--space-7); }
+
 .still-price-note { font-family: var(--font-display); font-style: italic; color: var(--ink-soft); font-size: 15px; margin: 22px 0 28px; }
 
 .still-faq-item { padding: 24px 0; max-width: 56ch; border-top: 1px solid var(--line); }
