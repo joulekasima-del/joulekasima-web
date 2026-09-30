@@ -11,9 +11,13 @@ const { feedbackInviteEmail } = require('../../lib/emails/feedback-invite-templa
 // reminder emails are switched off by default. They only send when the env var
 // STILL_REMINDER_EMAILS is exactly "on" (set it in Vercel → Environment
 // Variables and redeploy). While off, the reminder branches are skipped without
-// marking anything as sent, and the post-session feedback invite below keeps
-// working exactly as before. Reminders only ever target sessions still in the
+// marking anything as sent. Reminders only ever target sessions still in the
 // future, so switching them on later cannot produce a burst of stale emails.
+//
+// The post-session feedback invite is switched off the same way: it only sends
+// when STILL_FEEDBACK_EMAILS is exactly "on". While off it is skipped without
+// marking anything as sent, and even when on it only reaches sessions that ended
+// within the last 48 hours, so re-enabling it later can't invite old sessions.
 //
 // CRON_SECRET must be set — this route refuses every request otherwise,
 // since a missing secret should never silently mean "open to anyone."
@@ -31,6 +35,7 @@ module.exports = async (req, res) => {
   }
 
   const remindersOn = process.env.STILL_REMINDER_EMAILS === 'on';
+  const feedbackOn = process.env.STILL_FEEDBACK_EMAILS === 'on';
 
   try {
     const supabase = getSupabase();
@@ -51,6 +56,8 @@ module.exports = async (req, res) => {
       const hoursAway = (sessionStart.getTime() - Date.now()) / (1000 * 60 * 60);
       const minutesAway = (sessionStart.getTime() - Date.now()) / (1000 * 60);
       const emailBooking = { ...booking, date: booking.availability.date, start_time: booking.availability.start_time };
+      // Sessions run 30 minutes, so this is how long ago the session ended.
+      const endedHoursAgo = -hoursAway - 0.5;
 
       if (remindersOn && !booking.reminder_24h_sent && minutesAway > 0 && hoursAway <= 24.5 && hoursAway >= 23.5) {
         const template = reminderEmail(emailBooking, { minutesBefore: 24 * 60 });
@@ -70,7 +77,7 @@ module.exports = async (req, res) => {
         } catch (e) {
           console.error('Failed to send 15m reminder for', booking.reference, e);
         }
-      } else if (!booking.feedback_email_sent && hoursAway <= -24 && hoursAway >= -25) {
+      } else if (feedbackOn && !booking.feedback_email_sent && hoursAway <= -24 && hoursAway >= -25 && endedHoursAgo >= 0 && endedHoursAgo <= 48) {
         // Session started 24-25 hours ago — a low-pressure invite to share
         // feedback, sent once per booking. See docs on session_feedback.
         const template = feedbackInviteEmail(emailBooking);
@@ -84,7 +91,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    res.status(200).json({ ok: true, remindersEnabled: remindersOn, sent24h, sent15m, sentFeedback });
+    res.status(200).json({ ok: true, remindersEnabled: remindersOn, feedbackEnabled: feedbackOn, sent24h, sent15m, sentFeedback });
   } catch (err) {
     console.error('still/cron-reminder error', err);
     res.status(500).json({ error: 'Reminder cron failed.' });
