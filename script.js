@@ -43,7 +43,7 @@ form.addEventListener('submit', async (e) => {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Something went wrong.');
 
-    formNote.textContent = "Thanks — your message is on its way to me. I read every one and will reply soon.";
+    formNote.textContent = "Thank you, your message is on its way to me. I'll read it and get back to you soon.";
     formNote.classList.add('success');
     formNote.hidden = false;
     form.reset();
