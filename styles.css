@@ -219,6 +219,13 @@ h1, h2, h3 {
   letter-spacing: -0.01em;
   margin-bottom: 24px;
 }
+/* Break the hero headline after the comma only where it would wrap anyway (the
+   one-line headline stops fitting at a viewport of about 837px); below that it
+   stays on one line, or wraps naturally on small phones. */
+.hero-br { display: none; }
+@media (min-width: 837px) {
+  .hero-br { display: inline; }
+}
 
 .hero-sub {
   font-size: 18px;
