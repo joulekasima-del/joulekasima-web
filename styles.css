@@ -494,7 +494,10 @@ section[hidden] { display: none !important; }
   padding: var(--space-card-md);
 }
 
-.creative { padding: var(--space-8) var(--gutter-desktop) var(--space-13); border-top: 1px solid var(--line); }
+.creative { padding: 0 var(--gutter-desktop) var(--space-13); }
+/* The divider lives inside the padding so it matches the column (a border on the section itself
+   would run out to the section's outer edges, past the other dividers). */
+.creative::before { content: ""; display: block; border-top: 1px solid var(--line); margin-bottom: var(--space-8); }
 .creative-card { max-width: 720px; }
 
 .quiet-title {
@@ -541,6 +544,10 @@ section[hidden] { display: none !important; }
 
 /* About */
 .about { padding: var(--space-8) var(--gutter-desktop) var(--space-13); }
+
+/* Homepage column: the same 780px box as .hero (716px of content), so section headings, cards,
+   dividers and About share one centered column that lines up with the hero text. */
+.intro, .spotlight, .ventures-quiet, .creative, .about { max-width: 780px; }
 .about-grid {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
@@ -684,7 +691,8 @@ section[hidden] { display: none !important; }
   .intro { padding: var(--space-8) var(--gutter-mobile) 0; }
   .spotlight { padding: 0 var(--gutter-mobile) var(--space-5); }
   .ventures-quiet { padding: var(--space-2) var(--gutter-mobile) var(--space-9); }
-  .creative { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
+  .creative { padding: 0 var(--gutter-mobile) var(--space-12); }
+  .creative::before { margin-bottom: var(--space-7); }
   .about { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
   .contact { padding: var(--space-7) var(--gutter-mobile) var(--space-12); }
   .site-footer { padding: var(--space-6) var(--gutter-mobile); }
