@@ -177,9 +177,19 @@
   </div>
 </main>
 
-<footer class="site-footer" style="max-width: 640px; margin: 0 auto; border-top: 1px solid var(--line);">
-  <p style="font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint);">Payments are processed securely by Stripe. Your card details never touch our servers.</p>
+<div class="book-wrap">
+  <p style="font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint); margin: 0 0 var(--space-6);">Payments are processed securely by Stripe. Your card details never touch our servers.</p>
+</div>
+
+<footer class="site-footer wrap">
+  <p>© <span id="year"></span> Joule Kasima</p>
+  <div class="footer-links">
+    <a href="https://www.joulekasima.com">Joule Kasima</a>
+    <a href="https://instagram.com/joulekasima_" aria-label="Instagram" target="_blank" rel="noopener noreferrer">Instagram</a>
+    <a href="mailto:hello@joulekasima.com">hello@joulekasima.com</a>
+  </div>
 </footer>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/still.config.js"></script>
