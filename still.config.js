@@ -4,7 +4,7 @@
       // Whole currency units, per session. Each currency is priced by hand —
       // never derive one from the other with an exchange rate (rates drift,
       // this config should not). Prefer clean numbers.
-      prices: { THB: 20, USD: 25 },
+      prices: { THB: 750, USD: 25 },
       defaultCurrency: 'USD',      // used when the client sends no / an unknown currency
       // Visitor country (ISO code, from Vercel's x-vercel-ip-country header) ->
       // the currency suggested first. Any country not listed gets defaultCurrency.
