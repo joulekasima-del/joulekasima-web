@@ -7,7 +7,13 @@ const { feedbackInviteEmail } = require('../../lib/emails/feedback-invite-templa
 // .github/workflows/still-reminder-cron.yml (not Vercel Cron — Hobby plan
 // only allows a once-a-day schedule, and this needs 5-minute granularity to
 // catch the 15-minute-before window). Sends two reminders per session: one
-// ~24 hours before, one ~15 minutes before (decided §6).
+// ~24 hours before, one ~15 minutes before (decided §6) — BUT those two
+// reminder emails are switched off by default. They only send when the env var
+// STILL_REMINDER_EMAILS is exactly "on" (set it in Vercel → Environment
+// Variables and redeploy). While off, the reminder branches are skipped without
+// marking anything as sent, and the post-session feedback invite below keeps
+// working exactly as before. Reminders only ever target sessions still in the
+// future, so switching them on later cannot produce a burst of stale emails.
 //
 // CRON_SECRET must be set — this route refuses every request otherwise,
 // since a missing secret should never silently mean "open to anyone."
@@ -23,6 +29,8 @@ module.exports = async (req, res) => {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
+
+  const remindersOn = process.env.STILL_REMINDER_EMAILS === 'on';
 
   try {
     const supabase = getSupabase();
@@ -44,7 +52,7 @@ module.exports = async (req, res) => {
       const minutesAway = (sessionStart.getTime() - Date.now()) / (1000 * 60);
       const emailBooking = { ...booking, date: booking.availability.date, start_time: booking.availability.start_time };
 
-      if (!booking.reminder_24h_sent && hoursAway <= 24.5 && hoursAway >= 23.5) {
+      if (remindersOn && !booking.reminder_24h_sent && minutesAway > 0 && hoursAway <= 24.5 && hoursAway >= 23.5) {
         const template = reminderEmail(emailBooking, { minutesBefore: 24 * 60 });
         try {
           await resend.emails.send({ from: FROM, to: booking.email, subject: template.subject, html: template.html });
@@ -53,7 +61,7 @@ module.exports = async (req, res) => {
         } catch (e) {
           console.error('Failed to send 24h reminder for', booking.reference, e);
         }
-      } else if (!booking.reminder_15m_sent && minutesAway <= 17.5 && minutesAway >= 12.5) {
+      } else if (remindersOn && !booking.reminder_15m_sent && minutesAway > 0 && minutesAway <= 17.5 && minutesAway >= 12.5) {
         const template = reminderEmail(emailBooking, { minutesBefore: 15 });
         try {
           await resend.emails.send({ from: FROM, to: booking.email, subject: template.subject, html: template.html });
@@ -76,7 +84,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    res.status(200).json({ ok: true, sent24h, sent15m, sentFeedback });
+    res.status(200).json({ ok: true, remindersEnabled: remindersOn, sent24h, sent15m, sentFeedback });
   } catch (err) {
     console.error('still/cron-reminder error', err);
     res.status(500).json({ error: 'Reminder cron failed.' });
