@@ -21,7 +21,9 @@
     <nav id="primaryNav" class="primary-nav">
       <a href="#meditation">Meditation</a>
       <a href="#learn-thai">Learn Thai</a>
+      <!-- HIDDEN with the Up-coming section below: restore this link when the section is un-hidden.
       <a href="#upcoming">Up-coming</a>
+      -->
       <a href="#creative">Field Notes</a>
       <a href="#contact" class="nav-cta">Contact</a>
     </nav>
@@ -107,13 +109,15 @@
     </div>
   </section>
 
-  <section class="intro wrap" id="upcoming">
+  <!-- HIDDEN: the Up-coming heading and the Journey Planner / Kraft Junction cards below.
+       To bring them back, delete the `hidden` attribute on both <section> tags and restore the nav link at the top. -->
+  <section class="intro wrap" id="upcoming" hidden>
     <div class="intro-grid">
       <h2>Up-coming</h2>
     </div>
   </section>
 
-  <section class="ventures-quiet wrap">
+  <section class="ventures-quiet wrap" hidden>
     <article class="quiet-card">
       <h4 class="quiet-title">Journey Planner</h4>
       <p class="quiet-desc">A travel planning platform for conservation-based trips in Thailand, with AI woven into how it plans. Still experimenting — details coming soon.</p>

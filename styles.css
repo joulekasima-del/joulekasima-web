@@ -252,6 +252,10 @@ h1, h2, h3 {
 .btn-ghost:hover { border-color: var(--ink); }
 
 /* Intro */
+/* Sections marked `hidden` are removed entirely (author display rules like .ventures-quiet { display: grid }
+   would otherwise override the browser's default [hidden] behaviour). Delete the attribute to show one again. */
+section[hidden] { display: none !important; }
+
 .intro { padding: var(--space-10) var(--gutter-desktop) 0; }
 .intro-grid {
   border-top: 1px solid var(--line);
