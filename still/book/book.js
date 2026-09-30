@@ -335,7 +335,7 @@
       if (i < n) pill.classList.add('done');
       if (i === n) pill.classList.add('active');
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
   // ---------- Move to payment ----------

@@ -171,7 +171,7 @@ h1, h2, h3 {
   max-width: 780px;
 }
 
-.hero-3d {
+.hero-garden {
   position: absolute;
   top: 30px;
   left: 100%;
@@ -179,9 +179,24 @@ h1, h2, h3 {
   width: 340px;
   height: 420px;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.85;
   z-index: 0;
+  overflow: hidden;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
+.hero-garden * { vector-effect: non-scaling-stroke; }
+.hero-garden .sprig {
+  animation: gardenSway 7s ease-in-out infinite;
+}
+@keyframes gardenSway {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50% { transform: rotate(1.4deg); }
+}
+.hero-garden.is-paused .sprig { animation-play-state: paused; }
 
 .hero-kicker,
 .hero-headline,
@@ -191,7 +206,7 @@ h1, h2, h3 {
 }
 
 @media (max-width: 1100px) {
-  .hero-3d { display: none; }
+  .hero-garden { display: none; }
 }
 
 .hero-kicker {
@@ -212,6 +227,7 @@ h1, h2, h3 {
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-kicker::after { animation: none; }
+  .hero-garden .sprig { animation: none; }
 }
 
 .hero-headline {
@@ -948,6 +964,11 @@ section[hidden] { display: none !important; }
 @keyframes bookPulse { 50% { opacity: 0.3; } }
 .hold-badge.expired { color: var(--warn); background: var(--warn-bg); border-color: var(--warn); }
 .hold-badge.expired .dot { background: var(--warn); animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .still-kicker .cursor { animation: none; }
+  .hold-badge .dot { animation: none; }
+}
 
 .price-block { display: flex; justify-content: space-between; align-items: flex-end; border: 1px solid var(--line); border-radius: 3px; padding: var(--space-card-md); margin-bottom: var(--space-6); background: #fff; }
 .price-block .thb { font-family: var(--font-display); font-size: 26px; }

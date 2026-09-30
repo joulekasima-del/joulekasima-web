@@ -33,7 +33,73 @@
 <main id="top">
 
   <section class="hero wrap">
-    <canvas id="heroCanvas" class="hero-3d" aria-hidden="true"></canvas>
+<svg id="heroGarden" class="hero-garden" viewBox="0 0 340 420" aria-hidden="true" focusable="false">
+<defs>
+<path id="g-leaf" d="M0 0C4 -5 11 -5 16 0C11 5 4 5 0 0M2 0L14 0"/>
+<g id="g-wing"><path d="M0 -2C-6 -14 -20 -18 -22 -10C-23 -4 -12 0 0 0"/><path d="M0 0C-10 2 -17 8 -13 13C-9 16 -3 8 0 3"/><path d="M0 -1C-8 -8 -14 -12 -19 -11M0 1C-7 4 -10 8 -12 11"/></g>
+</defs>
+<g style="color:var(--line)">
+<path d="M336 34C312 58 318 98 296 122C280 140 296 168 282 196"/>
+<path d="M22 420C38 398 30 378 48 364"/>
+</g>
+<g style="color:var(--good)">
+<g class="sprig" style="transform-origin:300px 420px;animation-duration:7.4s;animation-delay:0s">
+<path d="M300 420 C292 360 322 300 296 232"/>
+<use href="#g-leaf" transform="translate(298.7 391.2) rotate(-42.6) scale(1.1)"/>
+<use href="#g-leaf" transform="translate(299.8 373.1) rotate(-129.3) scale(1)"/>
+<use href="#g-leaf" transform="translate(301.7 354.8) rotate(-40.3) scale(1)"/>
+<use href="#g-leaf" transform="translate(303.9 336.4) rotate(-125) scale(0.9)"/>
+<use href="#g-leaf" transform="translate(305.8 317.8) rotate(-45.2) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(306.8 298.9) rotate(-127.7) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(306.3 279.7) rotate(-56.7) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(303.9 260.1) rotate(-136.4) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(298.9 240.1) rotate(-73.3) scale(0.6)"/>
+<use href="#g-leaf" transform="translate(296 232) rotate(-110.9) scale(0.6)"/>
+</g>
+<g class="sprig" style="transform-origin:250px 420px;animation-duration:6.2s;animation-delay:-1.9s">
+<path d="M250 420 C246 388 232 360 238 318"/>
+<use href="#g-leaf" transform="translate(247.4 404.9) rotate(-147.4) scale(0.9)"/>
+<use href="#g-leaf" transform="translate(244.1 389.9) rotate(-59.7) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(240.6 374.7) rotate(-143) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(237.9 358.8) rotate(-58.5) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(236.6 341.7) rotate(-128) scale(0.6)"/>
+<use href="#g-leaf" transform="translate(237.4 323) rotate(-49.2) scale(0.5)"/>
+<use href="#g-leaf" transform="translate(238 318) rotate(-81.9) scale(0.5)"/>
+</g>
+<g class="sprig" style="transform-origin:330px 0px;animation-duration:8.6s;animation-delay:-3.4s">
+<path d="M330 0 C324 40 340 70 318 118"/>
+<use href="#g-leaf" transform="translate(328.6 18.5) rotate(136.5) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(328.9 33.3) rotate(43.4) scale(0.8)"/>
+<use href="#g-leaf" transform="translate(329.7 47.9) rotate(129.1) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(330.1 62.7) rotate(50.1) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(329.2 78.1) rotate(134.5) scale(0.6)"/>
+<use href="#g-leaf" transform="translate(326.3 94.5) rotate(67.6) scale(0.6)"/>
+<use href="#g-leaf" transform="translate(320.5 112.3) rotate(146.8) scale(0.5)"/>
+<use href="#g-leaf" transform="translate(318 118) rotate(114.6) scale(0.5)"/>
+</g>
+<g class="sprig" style="transform-origin:150px 420px;animation-duration:6.8s;animation-delay:-0.9s">
+<path d="M150 420 C154 396 140 380 146 352"/>
+<use href="#g-leaf" transform="translate(150.7 409) rotate(-137.8) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(149.1 396.3) rotate(-58) scale(0.7)"/>
+<use href="#g-leaf" transform="translate(146.5 383.7) rotate(-141.4) scale(0.6)"/>
+<use href="#g-leaf" transform="translate(144.6 370.4) rotate(-56.1) scale(0.5)"/>
+<use href="#g-leaf" transform="translate(145.4 355.3) rotate(-115.2) scale(0.4)"/>
+<use href="#g-leaf" transform="translate(146 352) rotate(-77.9) scale(0.4)"/>
+</g>
+</g>
+<g style="color:var(--amber)">
+<g class="bf" id="bf0" transform="translate(196 214) rotate(24) scale(.8)"><g class="wl"><use href="#g-wing"/></g><g class="wr"><use href="#g-wing" transform="scale(-1 1)"/></g><path d="M0 -6L0 9M0 -7C-1 -10 -3 -12 -5 -12.5M0 -7C1 -10 3 -12 5 -12.5"/></g>
+<g class="bf" id="bf1" transform="translate(96 318) rotate(-32) scale(.62)"><g class="wl" transform="scale(.7 1)"><use href="#g-wing"/></g><g class="wr" transform="scale(.7 1)"><use href="#g-wing" transform="scale(-1 1)"/></g><path d="M0 -6L0 9M0 -7C-1 -10 -3 -12 -5 -12.5M0 -7C1 -10 3 -12 5 -12.5"/></g>
+<g class="bf" id="bf2" transform="translate(16 232) rotate(8) scale(.7)"><g class="wl"><use href="#g-wing"/></g><g class="wr"><use href="#g-wing" transform="scale(-1 1)"/></g><path d="M0 -6L0 9M0 -7C-1 -10 -3 -12 -5 -12.5M0 -7C1 -10 3 -12 5 -12.5"/></g>
+</g>
+<g id="gardenBird" style="color:var(--ink)"><g id="birdPos" transform="translate(262 42) scale(.75)">
+<g id="birdFar" transform="translate(-4 -3) scale(1 .5)"><path d="M0 0C-4 -11 6 -19 16 -21C10 -15 8 -8 6 0M6 0C8 -8 11 -13 14 -17"/></g>
+<path d="M-14 2C-10 -5 2 -7 10 -4C15 -2 17 2 14 5C8 9 -6 8 -14 2Z"/>
+<circle cx="14" cy="-5" r="4"/><path d="M18 -6.2L25 -4.4L18 -3.4"/><circle cx="15" cy="-6" r=".6"/>
+<path d="M-14 2L-29 -3M-14 3.4L-30 3M-13 4.6L-27 9"/>
+<g id="birdNear" transform="translate(0 -3) scale(1 .7)"><path d="M0 0C-5 -13 7 -22 18 -24C11 -17 9 -9 6 0M6 0C9 -9 12 -15 16 -20"/></g>
+</g></g>
+</svg>
     <p class="hero-kicker">Meditation · Learn Thai</p>
     <h1 class="hero-headline">Building along the way,<br class="hero-br"> and sharing it.</h1>
     <p class="hero-sub">I'm Joule Kasima. This is my online home: what I'm working on, what I'm learning, and the things I offer along the way, in case they're useful to you too.</p>
@@ -187,8 +253,7 @@
   </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="hero-scene.js"></script>
+<script src="hero-garden.js" defer></script>
 <script src="script.js"></script>
 </body>
 </html>

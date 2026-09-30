@@ -7,7 +7,7 @@ No build step — plain HTML/CSS/JS, so it deploys to Vercel as-is.
 - `index.html` — all page structure and text content, in English
 - `styles.css` — all styling (colors/fonts as CSS variables at the top)
 - `script.js` — mobile nav toggle, footer year, contact form handler
-- `hero-scene.js` — the animated wireframe 3D background in the Hero section (Three.js, loaded from CDN)
+- `hero-garden.js` — gentle butterfly / songbird motion for the inline SVG garden in the Hero section (vanilla JS, no libraries)
 
 ## Editing text
 Since the site is single-language, text lives directly in `index.html`. Find the relevant section and edit the text inside the tags directly — no separate content file to manage.
