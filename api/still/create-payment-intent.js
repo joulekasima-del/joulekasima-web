@@ -2,6 +2,12 @@ const { getSupabase } = require('../../lib/supabase');
 const { getStripe } = require('../../lib/stripe');
 const { generateBookingReference } = require('../../lib/booking-ref');
 const cfg = require('../../lib/config');
+const Tz = require('../../assets/timezone');
+
+// PostgREST/Postgres error for a column that doesn't exist yet (migration 0004 not applied).
+function isMissingColumnError(err) {
+  return !!err && (err.code === 'PGRST204' || err.code === '42703' || /customer_timezone/i.test(String(err.message || '')));
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -19,7 +25,9 @@ module.exports = async (req, res) => {
       notes,
       newsletter_opt_in,
       currency: requestedCurrency, // optional; validated against the config's allowed list
+      customer_timezone: requestedTimezone, // optional IANA zone; display only, never used for price/availability/lead time
     } = req.body || {};
+    const customerTimezone = Tz.isValidTimeZone(requestedTimezone) ? requestedTimezone : null;
 
     if (!Array.isArray(availability_ids) || availability_ids.length === 0 || availability_ids.length > cfg.maxPerPurchase) {
       res.status(400).json({ error: `Pick between 1 and ${cfg.maxPerPurchase} sessions.` });
@@ -116,12 +124,20 @@ module.exports = async (req, res) => {
       amount_paid_minor: priceMinor, // this one session's share; amount_paid_thb is no longer written
       hold_token,
       newsletter_opt_in: !!newsletter_opt_in,
+      ...(customerTimezone ? { customer_timezone: customerTimezone } : {}),
     }));
 
-    const { data: bookings, error: bookingErr } = await supabase
+    let { data: bookings, error: bookingErr } = await supabase
       .from('bookings')
       .insert(bookingsToInsert)
       .select();
+    if (bookingErr && customerTimezone && isMissingColumnError(bookingErr)) {
+      // Migration 0004 (bookings.customer_timezone) hasn't been applied yet: book without recording the zone.
+      ({ data: bookings, error: bookingErr } = await supabase
+        .from('bookings')
+        .insert(bookingsToInsert.map(({ customer_timezone, ...rest }) => rest))
+        .select());
+    }
     if (bookingErr) throw bookingErr;
 
     res.status(200).json({

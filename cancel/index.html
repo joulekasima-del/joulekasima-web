@@ -73,6 +73,7 @@
 
 <script src="/still.config.js"></script>
 <script src="/assets/shared.js"></script>
+<script src="/assets/timezone.js"></script>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -85,10 +86,10 @@
     ['loading', 'not-found', 'details', 'done'].forEach((x) => { $(x).hidden = x !== id; });
   }
 
-  function fmtWhen(date, startTime) {
-    const d = new Date(`${date}T${startTime}`);
-    return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) +
-      ' · ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' (Chiang Mai)';
+  // Shown in the timezone the booking was made in ("(your time, New York GMT-4)"); older bookings with no
+  // recorded zone show Chiang Mai time. The stored session time is Chiang Mai wall-clock time.
+  function fmtWhen(date, startTime, tz) {
+    return Tz.formatWhen(date, startTime, tz, { fallbackLabel: '(Chiang Mai)' });
   }
 
   if (!ref || !token) {
@@ -102,7 +103,7 @@
       if (!ok) { show('not-found'); return; }
 
       $('d-ref').textContent = data.reference;
-      $('d-when').textContent = fmtWhen(data.date, data.start_time);
+      $('d-when').textContent = fmtWhen(data.date, data.start_time, data.customer_timezone);
       $('d-status').textContent = data.status;
       $('d-sub').textContent = `Hi ${data.first_name} — here's what cancelling now would mean.`;
       $('d-preview').textContent = data.preview.text;

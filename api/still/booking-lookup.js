@@ -1,6 +1,7 @@
 const { getSupabase } = require('../../lib/supabase');
 const cfg = require('../../lib/config');
 const shared = require('../../assets/shared');
+const Tz = require('../../assets/timezone');
 const { bookingAmountMinor, bookingCurrency } = require('../../lib/booking-money');
 
 function hoursUntil(date, startTime) {
@@ -26,7 +27,7 @@ module.exports = async (req, res) => {
     const supabase = getSupabase();
     const { data: booking, error } = await supabase
       .from('bookings')
-      .select('reference, first_name, status, amount_paid_minor, amount_paid_thb, currency, cancel_token, availability:availability_id(date, start_time)')
+      .select('*, availability:availability_id(date, start_time)')
       .eq('reference', ref)
       .single();
     if (error || !booking || booking.cancel_token !== token) {
@@ -67,6 +68,7 @@ module.exports = async (req, res) => {
       status: booking.status,
       date: booking.availability.date,
       start_time: booking.availability.start_time,
+      customer_timezone: Tz.isValidTimeZone(booking.customer_timezone) ? booking.customer_timezone : null,
       preview,
     });
   } catch (err) {
