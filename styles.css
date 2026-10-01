@@ -756,6 +756,14 @@ section[hidden] { display: none !important; }
 .still-body-copy { max-width: 48ch; font-size: 18px; color: var(--ink-soft); margin: 0 0 36px; }
 
 .still-section { padding: var(--space-12) 0; }
+
+/* .still-hero / .still-section are also .still-wrap; their padding shorthand above
+   zeroes the wrap's side gutter. Restore it wherever the 720px column would
+   otherwise touch the screen edge (viewport <= 720px + 2 gutters). */
+@media (max-width: 784px) {
+  .still-hero, .still-section { padding-left: var(--gutter-desktop); padding-right: var(--gutter-desktop); }
+}
+.still-hero, .still-section { scroll-margin-top: 76px; } /* sticky header height */
 .still-section + .still-section { border-top: 1px solid var(--line); }
 
 .still-h2 {
@@ -839,8 +847,8 @@ section[hidden] { display: none !important; }
 
 @media (max-width: 680px) {
   .still-wrap { padding: 0 var(--gutter-mobile); }
-  .still-section { padding: var(--space-9) 0; }
-  .still-hero { padding: var(--space-10) 0 var(--space-9); }
+  .still-section { padding: var(--space-9) var(--gutter-mobile); }
+  .still-hero { padding: var(--space-10) var(--gutter-mobile) var(--space-9); }
   .still-details-panel { padding: var(--space-card-lg-mobile) var(--gutter-mobile); }
 }
 
