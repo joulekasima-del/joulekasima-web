@@ -48,6 +48,66 @@
       <div id="upcoming"></div>
     </section>
 
+    <section id="blocks-section" aria-labelledby="blocks-h">
+      <h2 id="blocks-h" class="admin-h2">Blocked times</h2>
+      <p class="admin-note">Close days or slots on the public booking page. Existing bookings are never cancelled or changed. All dates and times here are Chiang Mai time.</p>
+      <p id="blocks-notice" class="admin-notice" role="status" hidden></p>
+
+      <div id="blocks-ui" hidden>
+        <div class="admin-card">
+          <div class="cal-head">
+            <button class="cal-nav" id="bk-prev" type="button" aria-label="Previous month">&lt;</button>
+            <span class="cal-month" id="bk-month">—</span>
+            <button class="cal-nav" id="bk-next" type="button" aria-label="Next month">&gt;</button>
+          </div>
+          <div class="cal-dow-row" id="bk-dow"></div>
+          <div class="cal-grid" id="bk-grid"></div>
+          <div class="cal-legend bk-legend">
+            <span><span class="bk-swatch is-blocked"></span> day blocked</span>
+            <span><span class="bk-swatch is-partial"></span> some slots blocked</span>
+            <span><span class="bk-swatch is-session"></span> booked session</span>
+          </div>
+        </div>
+
+        <div id="bk-day" class="admin-card bk-day" hidden></div>
+
+        <details class="admin-fold" id="bk-range-fold">
+          <summary><span class="admin-h3">Block a range (trips)</span></summary>
+          <form id="bk-range-form" class="bk-form" novalidate>
+            <div class="bk-dates">
+              <div>
+                <label class="admin-label" for="bk-from">From</label>
+                <input type="date" id="bk-from" required>
+              </div>
+              <div>
+                <label class="admin-label" for="bk-to">To</label>
+                <input type="date" id="bk-to" required>
+              </div>
+            </div>
+            <fieldset class="bk-fieldset">
+              <legend class="admin-label">What to close</legend>
+              <label class="bk-check"><input type="radio" name="bk-mode" value="whole" checked> Whole days</label>
+              <label class="bk-check"><input type="radio" name="bk-mode" value="slots"> Only these slots</label>
+              <div id="bk-range-slots" class="bk-checks" hidden></div>
+            </fieldset>
+            <fieldset class="bk-fieldset">
+              <legend class="admin-label">On these weekdays</legend>
+              <div id="bk-range-weekdays" class="bk-checks"></div>
+            </fieldset>
+            <label class="admin-label" for="bk-range-reason">Reason (private, optional)</label>
+            <input type="text" id="bk-range-reason" class="bk-input" maxlength="200" autocomplete="off">
+            <p id="bk-range-error" class="admin-error" role="alert" hidden></p>
+            <button type="submit" class="admin-btn">Review</button>
+          </form>
+        </details>
+
+        <div id="bk-review" class="admin-card bk-review" hidden></div>
+
+        <h3 class="admin-h3 bk-list-h">Current blocks <span id="bk-count" class="admin-count"></span></h3>
+        <div id="bk-list"></div>
+      </div>
+    </section>
+
     <details class="admin-fold" id="past-fold">
       <summary><span class="admin-h2">Past</span> <span id="past-count" class="admin-count"></span></summary>
       <div id="past"></div>

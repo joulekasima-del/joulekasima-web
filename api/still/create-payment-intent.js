@@ -3,6 +3,7 @@ const { getStripe } = require('../../lib/stripe');
 const { generateBookingReference } = require('../../lib/booking-ref');
 const cfg = require('../../lib/config');
 const Tz = require('../../assets/timezone');
+const { findBlockedSlots } = require('../../lib/blocks');
 
 // PostgREST/Postgres error for a column that doesn't exist yet (migration 0004 not applied).
 function isMissingColumnError(err) {
@@ -49,7 +50,7 @@ module.exports = async (req, res) => {
     // Every picked slot must still be held by this same client, and not expired.
     const { data: slots, error: slotErr } = await supabase
       .from('availability')
-      .select('id, locked_until, locked_by, booked')
+      .select('id, date, start_time, locked_until, locked_by, booked')
       .in('id', availability_ids);
     if (slotErr) throw slotErr;
 
@@ -60,6 +61,12 @@ module.exports = async (req, res) => {
         res.status(409).json({ error: 'One of your held slots has expired. Please pick your times again.' });
         return;
       }
+    }
+
+    // Re-check owner blocks before anything is charged (a block may have been added after the hold was placed).
+    if ((await findBlockedSlots(supabase, slots)).length) {
+      res.status(409).json({ error: 'One of your chosen times is no longer available. Please pick your times again.' });
+      return;
     }
 
     // A client can only *pick* a currency from the config's allowed list
