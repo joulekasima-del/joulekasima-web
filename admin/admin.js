@@ -151,7 +151,7 @@
     renderList($('upcoming'), upcoming, 'upcoming', 'No upcoming sessions.', true);
     renderList($('past'), past, 'past', 'No past sessions.', false);
     renderList($('cancelled'), cancelled, 'cancelled', 'No cancelled bookings.', false);
-    $('updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }) + '. Read-only.';
+    $('updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }) + '.';
     showDashboard();
     startTimers();
     updateCountdown();
