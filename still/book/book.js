@@ -259,7 +259,7 @@
 
   // ---------- Timezone heading + "change timezone" ----------
   function updateTzHeading(instant) {
-    $('tz-heading').textContent = `(your time, ${Tz.zoneLabel(state.tz, instant || new Date())})`;
+    $('tz-heading').textContent = `(your time, ${Tz.zoneLabel(state.tz, instant || new Date())})*`;
   }
   updateTzHeading();
 
