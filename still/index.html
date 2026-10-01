@@ -16,7 +16,10 @@
 <header class="site-header">
   <div class="wrap header-row">
     <a href="https://www.joulekasima.com" class="wordmark">Joule Kasima<span class="venture-tag">still</span></a>
-    <nav class="primary-nav" style="display:flex;">
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="primaryNav" class="primary-nav">
       <a href="https://www.joulekasima.com/">home</a>
       <a href="/still/book" class="nav-cta">book</a>
     </nav>
@@ -157,6 +160,21 @@
 <script src="/still.config.js"></script>
 <script src="/assets/shared.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script>
+  // Mobile nav toggle (same pattern as script.js on the homepage)
+  const navToggle = document.getElementById('navToggle');
+  const primaryNav = document.getElementById('primaryNav');
+  navToggle.addEventListener('click', () => {
+    const isOpen = primaryNav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+  primaryNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      primaryNav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>
 <script>
 // One price, in the visitor's suggested currency (Thailand -> THB, else USD),
 // from /api/still/config. The row is laid out (but invisible) from the start
