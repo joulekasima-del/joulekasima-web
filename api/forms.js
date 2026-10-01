@@ -9,6 +9,12 @@ const { handleThaiTalkNotify } = require('../lib/forms/thai-talk-notify');
 // this file only reads formType and dispatches; it never touches either
 // form's own logic.
 module.exports = async (req, res) => {
+  // The owner's private admin API also lives in this function (same 12-function-cap reason), reached as
+  // /api/forms?admin=login|logout|bookings. It is required lazily, so the public forms never depend on it.
+  if (req.query && req.query.admin !== undefined) {
+    return require('../lib/admin').handle(req, res);
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;

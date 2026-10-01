@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="admin">
+
+<!-- Intentionally an empty shell: no booking data is ever in this HTML. Everything is fetched, after sign-in,
+     from /api/forms?admin=bookings (which checks the session cookie first). -->
+<header class="admin-top">
+  <div class="admin-wrap admin-top-row">
+    <span class="wordmark">Joule Kasima<span class="venture-tag">admin</span></span>
+    <button type="button" id="logout" class="admin-link" hidden>Sign out</button>
+  </div>
+</header>
+
+<main class="admin-wrap">
+
+  <section id="login" class="admin-card login-card" hidden>
+    <h1 class="admin-h1">Admin</h1>
+    <form id="login-form" autocomplete="on">
+      <label for="password" class="admin-label">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="200">
+      <p id="login-error" class="admin-error" role="alert" hidden></p>
+      <button type="submit" id="login-btn" class="admin-btn">Sign in</button>
+    </form>
+  </section>
+
+  <p id="status" class="admin-status">Loading…</p>
+
+  <div id="dashboard" hidden>
+    <section aria-labelledby="next-h">
+      <h2 id="next-h" class="admin-h2">Next up</h2>
+      <div id="next"></div>
+    </section>
+
+    <section aria-labelledby="up-h">
+      <h2 id="up-h" class="admin-h2">Upcoming <span id="up-count" class="admin-count"></span></h2>
+      <div id="upcoming"></div>
+    </section>
+
+    <details class="admin-fold" id="past-fold">
+      <summary><span class="admin-h2">Past</span> <span id="past-count" class="admin-count"></span></summary>
+      <div id="past"></div>
+    </details>
+
+    <details class="admin-fold" id="cancelled-fold">
+      <summary><span class="admin-h2">Cancelled</span> <span id="cancelled-count" class="admin-count"></span></summary>
+      <div id="cancelled"></div>
+    </details>
+
+    <p id="updated" class="admin-updated"></p>
+  </div>
+
+</main>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>
