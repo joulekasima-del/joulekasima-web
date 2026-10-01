@@ -882,11 +882,11 @@ section[hidden] { display: none !important; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
-.field input, .field textarea {
+.field input, .field textarea, .field select {
   width: 100%; font-family: var(--font-body); font-size: 15px; color: var(--ink);
   background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 11px 13px; outline: none;
 }
-.field input:focus, .field textarea:focus { border-color: var(--accent); }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
 .field textarea { resize: vertical; min-height: 74px; }
 .field .optional-tag { color: var(--ink-faint); font-weight: 400; }
 .field-error { color: var(--warn); font-size: 13px; margin-top: 6px; }
@@ -925,6 +925,10 @@ section[hidden] { display: none !important; }
 .cal-legend .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.6; display: inline-block; }
 
 .time-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 22px; } /* 2 x 2 for the four daily slots */
+.tz-note { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; color: var(--ink-faint); margin: -6px 0 12px; }
+.tz-link { color: var(--ink-faint); text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; white-space: nowrap; }
+.tz-link:hover { color: var(--ink-soft); }
+.tz-picker { margin-bottom: 14px; }
 .time-chip { font-family: var(--font-mono); font-size: 13.5px; background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 11px 8px; cursor: pointer; text-align: center; color: var(--ink); }
 .time-chip:hover { border-color: var(--ink-faint); }
 .time-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--paper); }

@@ -92,7 +92,12 @@
           <div class="cal-legend"><span><span class="dot"></span> open for booking</span><span style="opacity:0.5;">greyed = past, full, or not yet open</span></div>
         </div>
 
-        <h2 class="block-title">&gt; choose a time <span style="color:var(--ink-faint); font-weight:400;">(Chiang Mai time, GMT+7)</span></h2>
+        <h2 class="block-title">&gt; choose a time <span id="tz-heading" style="color:var(--ink-faint); font-weight:400;"></span></h2>
+        <p class="tz-note"><span id="tz-hint">*These times are in your timezone. I'm in Chiang Mai, please choose what fits your day.</span> <a href="#" id="tz-change" class="tz-link" role="button">change timezone</a></p>
+        <div class="field tz-picker" id="tz-picker" hidden>
+          <label for="tz-select">Your timezone</label>
+          <select id="tz-select"></select>
+        </div>
         <div class="time-grid" id="time-grid"></div>
       </div>
 
@@ -194,6 +199,7 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script src="/still.config.js"></script>
 <script src="/assets/shared.js"></script>
+<script src="/assets/timezone.js"></script>
 <script src="/still/book/book.js"></script>
 </body>
 </html>

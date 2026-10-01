@@ -43,6 +43,16 @@
     currencyKnown: false, // price text stays blank until the suggested currency is known (no flash of the wrong one)
     switching: false,
     fname: '', lname: '', email: '',
+    // The customer's own timezone (IANA name). Sessions are stored as Chiang Mai wall-clock time;
+    // everything shown here is converted for display only (assets/timezone.js). Never used for pricing,
+    // availability or lead time - the server decides those on the real instant.
+    tz: (function () {
+      try {
+        const saved = sessionStorage.getItem('still_tz');
+        if (saved && Tz.isValidTimeZone(saved)) return saved;
+      } catch (e) { /* storage may be unavailable */ }
+      return Tz.detectTimeZone();
+    })(),
   };
 
   // ---------- Quantity selector ----------
@@ -95,14 +105,10 @@
   const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const MON_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  function todayNormalized() {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
-  const TODAY = todayNormalized();
-  let viewYear = TODAY.getFullYear();
-  let viewMonth = TODAY.getMonth();
+  // "Today" as a YYYY-MM-DD date in the customer's zone, taken from the real current instant.
+  const todayLocal = () => Tz.localDate(new Date(), state.tz);
+  let viewYear = +todayLocal().slice(0, 4);
+  let viewMonth = +todayLocal().slice(5, 7) - 1;
 
   const dowRow = $('cal-dow-row');
   DOW.forEach((d) => {
@@ -124,6 +130,27 @@
     return data;
   }
 
+  // Slots for one month of the CUSTOMER's calendar (m is 0-based). The API groups by Chiang Mai month, so a
+  // local month can include slots from the neighbouring Chiang Mai month(s) (e.g. 1 Nov 09:00 Chiang Mai is
+  // 31 Oct evening in New York). Each slot gets its real instant and local date; windowEnd becomes a local date.
+  async function fetchLocalMonth(y, m) {
+    const months = Tz.chiangMaiMonthsForLocalMonth(y, m + 1, state.tz);
+    const results = await Promise.all(months.map((cm) => fetchMonth(cm.year, cm.month - 1)));
+    const prefix = `${y}-${String(m + 1).padStart(2, '0')}`;
+    const slots = [];
+    let windowEnd = null;
+    results.forEach((res) => {
+      if (res.windowEnd) windowEnd = res.windowEnd;
+      (res.slots || []).forEach((slot) => {
+        slot._inst = Tz.slotInstant(slot.date, slot.start_time);
+        slot.localDate = Tz.localDate(slot._inst, state.tz);
+        if (slot.localDate.slice(0, 7) === prefix) slots.push(slot);
+      });
+    });
+    const localWindowEnd = windowEnd ? Tz.localDate(Tz.slotInstant(windowEnd, '23:59:59'), state.tz) : null;
+    return { slots, windowEnd: localWindowEnd };
+  }
+
   function markSlotAvailable(dateStr, availabilityId) {
     Object.values(state.monthCache).forEach((month) => {
       const slot = (month.slots || []).find((s) => s.id === availabilityId);
@@ -142,11 +169,12 @@
     const grid = $('cal-grid');
     grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px 0; color:var(--ink-faint); font-family:var(--font-mono); font-size:12px;">loading…</div>';
 
-    const { slots, windowEnd } = await fetchMonth(viewYear, viewMonth);
+    const { slots, windowEnd } = await fetchLocalMonth(viewYear, viewMonth);
     const byDate = {};
     (slots || []).forEach((s) => {
-      (byDate[s.date] = byDate[s.date] || []).push(s);
+      (byDate[s.localDate] = byDate[s.localDate] || []).push(s);
     });
+    const today = todayLocal();
 
     grid.innerHTML = '';
     const firstOfMonth = new Date(viewYear, viewMonth, 1);
@@ -161,14 +189,13 @@
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = isoDate(viewYear, viewMonth, day);
-      const cellDate = new Date(viewYear, viewMonth, day);
       const cell = document.createElement('div');
       cell.className = 'cal-cell';
       cell.textContent = day;
 
-      if (cellDate.getTime() === TODAY.getTime()) cell.classList.add('today');
+      if (dateStr === today) cell.classList.add('today');
 
-      if (cellDate < TODAY) {
+      if (dateStr < today) {
         cell.classList.add('past');
       } else if (windowEnd && dateStr > windowEnd) {
         cell.classList.add('closed');
@@ -186,8 +213,8 @@
       grid.appendChild(cell);
     }
 
-    const atCurrentMonth = viewYear === TODAY.getFullYear() && viewMonth === TODAY.getMonth();
-    $('cal-prev').disabled = atCurrentMonth;
+    const nowYM = +today.slice(0, 4) * 12 + (+today.slice(5, 7) - 1);
+    $('cal-prev').disabled = viewYear * 12 + viewMonth <= nowYM;
   }
 
   $('cal-prev').addEventListener('click', () => {
@@ -211,10 +238,11 @@
   function renderTimeGrid(daySlots) {
     const grid = $('time-grid');
     grid.innerHTML = '';
-    const sorted = [...daySlots].sort((a, b) => a.start_time.localeCompare(b.start_time));
+    const sorted = [...daySlots].sort((a, b) => a._inst - b._inst);
+    if (sorted.length) updateTzHeading(sorted[0]._inst);
     sorted.forEach((slot) => {
       const chip = document.createElement('div');
-      const label = fmtTime(slot.start_time);
+      const label = Tz.clock(slot._inst, state.tz);
       chip.className = 'time-chip' + (!slot.available ? ' taken' : '');
       chip.textContent = slot.available ? label : label + ' · taken';
       if (slot.available) {
@@ -224,17 +252,43 @@
     });
   }
 
-  function fmtTime(t) {
-    const [h, m] = t.split(':').map(Number);
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  }
+  // A picked session is stored as { date, start_time } in Chiang Mai time; these show it in the customer's zone.
+  const sessionInstant = (s) => Tz.slotInstant(s.date, s.start_time);
+  const fmtSession = (s) => { const i = sessionInstant(s); return `${Tz.dayShort(i, state.tz)} · ${Tz.clock(i, state.tz)}`; };
+  const yourTimeLabel = (s) => `(your time, ${Tz.zoneLabel(state.tz, sessionInstant(s))})`;
 
-  function fmtDate(dateStr) {
-    const d = new Date(`${dateStr}T00:00:00`);
-    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  // ---------- Timezone heading + "change timezone" ----------
+  function updateTzHeading(instant) {
+    $('tz-heading').textContent = `(your time, ${Tz.zoneLabel(state.tz, instant || new Date())})`;
   }
+  updateTzHeading();
+
+  const tzSelect = $('tz-select');
+  Tz.listTimeZones([state.tz, Tz.detectTimeZone()]).forEach((z) => {
+    const opt = document.createElement('option');
+    opt.value = z;
+    opt.textContent = `${Tz.modernName(z).replace(/_/g, ' ')} (${Tz.offsetLabel(new Date(), z)})`;
+    tzSelect.appendChild(opt);
+  });
+  tzSelect.value = state.tz;
+  $('tz-change').addEventListener('click', (e) => {
+    e.preventDefault();
+    $('tz-picker').hidden = !$('tz-picker').hidden;
+    if (!$('tz-picker').hidden) tzSelect.focus();
+  });
+  tzSelect.addEventListener('change', () => {
+    if (!Tz.isValidTimeZone(tzSelect.value)) return;
+    state.tz = tzSelect.value;
+    try { sessionStorage.setItem('still_tz', state.tz); } catch (e) { /* ignore */ }
+    state.selectedDate = null;
+    $('time-grid').innerHTML = '';
+    const today = todayLocal();
+    viewYear = +today.slice(0, 4);
+    viewMonth = +today.slice(5, 7) - 1;
+    updateTzHeading();
+    renderPickedList();
+    renderCalendar();
+  });
 
   // ---------- Committing a pick: locks the slot server-side immediately ----------
   async function commitPick(slot, chipEl) {
@@ -274,7 +328,7 @@
     state.pickedSessions.forEach((s, i) => {
       const row = document.createElement('div');
       row.className = 'picked-row';
-      row.innerHTML = `<span><span class="p-label">session ${i + 1}</span> — ${fmtDate(s.date)} · ${fmtTime(s.start_time)}</span>` +
+      row.innerHTML = `<span><span class="p-label">session ${i + 1}</span> — ${fmtSession(s)}</span>` +
         `<button class="p-redo" type="button" data-idx="${i}">redo</button>`;
       list.appendChild(row);
     });
@@ -353,7 +407,7 @@
       state.pickedSessions.forEach((s, i) => {
         const row = document.createElement('div');
         row.className = 'summary-row';
-        row.innerHTML = `<span class="label">session ${i + 1}</span><span class="value">${fmtDate(s.date)} · ${fmtTime(s.start_time)} (Chiang Mai)</span>`;
+        row.innerHTML = `<span class="label">session ${i + 1}</span><span class="value">${fmtSession(s)} ${yourTimeLabel(s)}</span>`;
         whenList.appendChild(row);
       });
       $('summary-name').textContent = `${state.fname} ${state.lname}`;
@@ -420,6 +474,7 @@
         notes: $('notes').value.trim(),
         newsletter_opt_in: $('newsletter').checked,
         currency: state.currency,
+        customer_timezone: state.tz,
       }),
     });
     const data = await r.json();
@@ -576,7 +631,7 @@
       card.className = 'session-card';
       card.innerHTML =
         `<div class="sc-head"><span class="sc-label">session ${i + 1} of ${sessions.length}</span><span class="sc-ref">${s.reference}</span></div>` +
-        `<div class="sc-when">${fmtDate(s.date)} · ${fmtTime(s.start_time)} (Chiang Mai)</div>` +
+        `<div class="sc-when">${fmtSession(s)} ${yourTimeLabel(s)}</div>` +
         `<div class="sc-link-k">&gt; call link (auto-generated via Google Calendar)</div>` +
         `<div class="sc-link"><a href="${s.call_link}" target="_blank" rel="noopener">${s.call_link}</a></div>` +
         `<div class="sc-manage"><a href="${manageUrl}">manage this session</a></div>`;
@@ -692,8 +747,8 @@
     state.paymentIntentId = null;
     state.totalDisplay = null;
     state.monthCache = {};
-    viewYear = TODAY.getFullYear();
-    viewMonth = TODAY.getMonth();
+    viewYear = +todayLocal().slice(0, 4);
+    viewMonth = +todayLocal().slice(5, 7) - 1;
     renderQty();
     renderPickedList();
     renderPickerPanel();
