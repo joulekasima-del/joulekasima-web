@@ -924,7 +924,7 @@ section[hidden] { display: none !important; }
 .cal-legend { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); }
 .cal-legend .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.6; display: inline-block; }
 
-.time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 22px; }
+.time-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 22px; } /* 2 x 2 for the four daily slots */
 .time-chip { font-family: var(--font-mono); font-size: 13.5px; background: #fff; border: 1px solid var(--line); border-radius: 3px; padding: 11px 8px; cursor: pointer; text-align: center; color: var(--ink); }
 .time-chip:hover { border-color: var(--ink-faint); }
 .time-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--paper); }
