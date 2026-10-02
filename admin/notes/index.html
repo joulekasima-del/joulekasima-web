@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Notes · Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/admin/admin.css">
+<link rel="stylesheet" href="/assets/fieldnotes-article.css">
+<link rel="stylesheet" href="/admin/notes/notes.css">
+</head>
+<body class="admin">
+
+<!-- Private writing page. An empty shell: no post text is ever in this HTML. Everything is fetched, after the
+     session cookie is checked, from /api/forms?admin=notes|note|... (the same sign-in as /admin). -->
+<header class="admin-top">
+  <div class="admin-wrap fn-wide admin-top-row">
+    <span class="wordmark">Joule Kasima<span class="venture-tag">admin</span></span>
+    <a class="admin-link" href="/admin">&larr; Admin</a>
+  </div>
+</header>
+
+<main class="admin-wrap fn-wide">
+
+  <section id="fn-signin" class="admin-card login-card" hidden>
+    <h1 class="admin-h1">Sign in first</h1>
+    <p class="admin-note">This page uses the same sign-in as the admin page. Open <a href="/admin">/admin</a>, sign in, then come back here.</p>
+  </section>
+
+  <p id="fn-status" class="admin-status">Loading…</p>
+  <p id="fn-notice" class="admin-notice" role="status" hidden></p>
+
+  <div id="fn-app" hidden>
+    <div class="fn-top">
+      <h1 class="admin-h1 fn-h1">Field Notes</h1>
+      <nav class="fn-tabs" aria-label="Field Notes sections">
+        <button type="button" class="fn-tab" id="tab-posts" aria-current="page">Posts</button>
+        <button type="button" class="fn-tab" id="tab-categories">Categories</button>
+      </nav>
+    </div>
+    <p class="admin-note fn-public-note"><strong>Public pages arrive in the next update.</strong> Publishing a post here only marks it as published. Nothing appears on the website yet.</p>
+
+    <!-- Posts list -->
+    <section id="view-posts" aria-label="Posts">
+      <div class="fn-actions"><button type="button" class="admin-btn" id="new-post">New post</button></div>
+      <div id="backup-new" class="fn-banner" hidden></div>
+      <h2 class="admin-h2">Drafts <span id="count-drafts" class="admin-count"></span></h2>
+      <div id="list-drafts"></div>
+      <h2 class="admin-h2">Published <span id="count-published" class="admin-count"></span></h2>
+      <div id="list-published"></div>
+    </section>
+
+    <!-- Categories -->
+    <section id="view-categories" aria-label="Categories" hidden>
+      <p class="admin-note">Categories are made by typing a name. A post can have up to 8. Renaming changes the name everywhere; deleting only removes the label from posts, it never deletes a post.</p>
+      <form id="cat-add-form" class="fn-cat-add" autocomplete="off">
+        <label class="admin-label" for="cat-add-input">New category</label>
+        <div class="fn-row">
+          <input id="cat-add-input" class="bk-input" type="text" maxlength="60" placeholder="e.g. Slow living">
+          <button type="submit" class="admin-btn is-outline">Add</button>
+        </div>
+      </form>
+      <p id="cat-error" class="admin-error" role="alert" hidden></p>
+      <div id="cat-list"></div>
+    </section>
+
+    <!-- Editor -->
+    <section id="view-editor" aria-label="Editor" hidden>
+      <div class="fn-bar">
+        <button type="button" class="admin-link fn-back" id="ed-back">&larr; All posts</button>
+        <span id="ed-state" class="fn-state" role="status" aria-live="polite"></span>
+        <span id="ed-badge" class="fn-badge"></span>
+      </div>
+
+      <div id="ed-banner" class="fn-banner" role="alert" hidden></div>
+
+      <div class="fn-buttons">
+        <button type="button" class="admin-btn is-outline" id="btn-save">Save draft</button>
+        <button type="button" class="admin-btn" id="btn-publish">Publish</button>
+        <button type="button" class="admin-btn is-outline" id="btn-unpublish" hidden>Unpublish</button>
+        <button type="button" class="admin-btn is-outline fn-danger" id="btn-delete">Delete</button>
+      </div>
+      <div id="delete-confirm" class="fn-banner is-warn" hidden>
+        <p class="fn-banner-text">Delete this post forever? This cannot be undone.</p>
+        <div class="fn-buttons"><button type="button" class="admin-btn fn-danger-solid" id="btn-delete-yes">Yes, delete it</button><button type="button" class="admin-btn is-outline" id="btn-delete-no">Keep it</button></div>
+      </div>
+      <p id="ed-error" class="admin-error" role="alert" hidden></p>
+
+      <div class="fn-mobile-toggle" role="tablist" aria-label="Edit or preview">
+        <button type="button" role="tab" id="pane-edit" aria-selected="true">Edit</button>
+        <button type="button" role="tab" id="pane-preview" aria-selected="false">Preview</button>
+      </div>
+
+      <div class="fn-grid" id="ed-grid" data-pane="edit">
+        <div class="fn-pane fn-pane-edit">
+          <label class="admin-label" for="f-title">Title</label>
+          <input id="f-title" class="fn-title-input" type="text" autocomplete="off" placeholder="Title" aria-describedby="title-count">
+          <label class="admin-label" for="f-summary">Summary (optional)</label>
+          <textarea id="f-summary" class="fn-summary-input" rows="2" placeholder="One or two sentences"></textarea>
+
+          <div class="fn-toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" data-cmd="bold" title="Bold (Ctrl/Cmd+B)" aria-label="Bold"><b>B</b></button>
+            <button type="button" data-cmd="italic" title="Italic (Ctrl/Cmd+I)" aria-label="Italic"><i>I</i></button>
+            <button type="button" data-cmd="h2" title="Heading" aria-label="Heading">H2</button>
+            <button type="button" data-cmd="h3" title="Subheading" aria-label="Subheading">H3</button>
+            <button type="button" data-cmd="quote" title="Quote" aria-label="Quote">&ldquo; &rdquo;</button>
+            <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list">&bull; List</button>
+            <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list">1. List</button>
+            <button type="button" data-cmd="link" title="Link (Ctrl/Cmd+K)" aria-label="Link">Link</button>
+            <button type="button" data-cmd="hr" title="Divider" aria-label="Divider">&mdash;</button>
+          </div>
+          <label class="admin-label fn-sr" for="f-body">Body</label>
+          <textarea id="f-body" class="fn-body-input" placeholder="Write here. A blank line starts a new paragraph."></textarea>
+          <p class="fn-count"><span id="body-count"></span></p>
+          <details class="fn-help"><summary>Formatting help</summary>
+            <p><code>## Heading</code> &nbsp; <code>### Subheading</code> &nbsp; <code>**bold**</code> &nbsp; <code>*italic*</code> &nbsp; <code>&gt; quote</code> &nbsp; <code>- list item</code> &nbsp; <code>1. numbered</code> &nbsp; <code>[text](https://link)</code> &nbsp; <code>---</code> divider.<br>A new line is a line break; a blank line starts a new paragraph. Nothing else is allowed: HTML is shown as plain text.</p>
+          </details>
+
+          <div class="admin-card fn-settings">
+            <h2 class="admin-h3">Post settings</h2>
+            <label class="admin-label" for="f-slug">Slug (the web address)</label>
+            <input id="f-slug" class="bk-input" type="text" autocomplete="off" spellcheck="false" placeholder="made from the title">
+            <p id="slug-error" class="admin-error" role="alert" hidden></p>
+            <p class="admin-note fn-slug-note">English letters, numbers, Thai letters and hyphens. It is made from the title until you edit it; a Thai-only title gets a date and a short code.</p>
+
+            <div class="fn-two">
+              <div>
+                <label class="admin-label" for="f-lang">Language</label>
+                <select id="f-lang" class="bk-input"><option value="en">English</option><option value="th">Thai</option></select>
+                <p id="lang-hint" class="admin-note fn-hint"></p>
+              </div>
+              <div id="font-wrap">
+                <label class="admin-label" for="f-font">Thai font</label>
+                <select id="f-font" class="bk-input"></select>
+                <p class="admin-note fn-hint"><a href="/admin/notes/fonts" target="_blank" rel="noopener noreferrer">See all four fonts side by side</a></p>
+              </div>
+            </div>
+
+            <label class="admin-label" for="f-cat">Categories <span id="cat-limit" class="admin-count"></span></label>
+            <div id="chips" class="fn-chips" aria-live="polite"></div>
+            <div class="fn-suggest-wrap">
+              <input id="f-cat" class="bk-input" type="text" autocomplete="off" maxlength="60" placeholder="Type a name and press Return" role="combobox" aria-expanded="false" aria-controls="cat-suggest" aria-autocomplete="list">
+              <ul id="cat-suggest" class="fn-suggest" role="listbox" hidden></ul>
+            </div>
+            <p id="cat-msg" class="admin-note fn-hint" role="status"></p>
+          </div>
+        </div>
+
+        <div class="fn-pane fn-pane-preview">
+          <p class="admin-label">Preview <span class="admin-count">(how it will look)</span></p>
+          <div class="fn-preview-card"><article id="preview" class="fn-article"></article></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="/assets/fn-text.js"></script>
+<script src="/assets/fn-render.js"></script>
+<script src="/admin/notes/notes.js"></script>
+</body>
+</html>

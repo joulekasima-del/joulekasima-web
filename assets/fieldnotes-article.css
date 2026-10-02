@@ -1,0 +1,54 @@
+/* Field Notes article typography. Scoped to .fn-article so it can be reused as-is by the public pages later.
+   Uses the site's variables from /styles.css (colours, fonts, spacing). No images, no inline styles needed.
+
+   Thai: put lang="th" on the article and one fn-font-<key> class on it. The font stack always lists the site's Latin
+   font FIRST, so English words keep the site look and only Thai characters fall through to the Thai font. */
+.fn-article {
+  --fn-font: var(--font-body, "Inter"), -apple-system, BlinkMacSystemFont, sans-serif;
+  --fn-head: var(--font-display, "Fraunces"), Georgia, serif;
+  font-family: var(--fn-font);
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--ink);
+  max-width: 42rem;
+  overflow-wrap: anywhere; /* a long string or URL never pushes the page wider */
+  word-break: normal;
+}
+.fn-article:lang(th), .fn-article[lang="th"] { line-height: 1.9; } /* Thai has tall marks above and below the line */
+
+/* the four free Thai fonts (SIL OFL, Google Fonts) */
+.fn-font-noto-sans-thai { --fn-font: "Inter", "Noto Sans Thai", sans-serif; --fn-head: "Fraunces", "Noto Sans Thai", Georgia, serif; }
+.fn-font-noto-serif-thai { --fn-font: "Fraunces", "Noto Serif Thai", Georgia, serif; --fn-head: "Fraunces", "Noto Serif Thai", Georgia, serif; }
+.fn-font-sarabun { --fn-font: "Inter", "Sarabun", sans-serif; --fn-head: "Fraunces", "Sarabun", Georgia, serif; }
+.fn-font-prompt { --fn-font: "Inter", "Prompt", sans-serif; --fn-head: "Fraunces", "Prompt", Georgia, serif; }
+
+.fn-article .fn-title { font-family: var(--fn-head); font-weight: 500; font-size: 36px; line-height: 1.2; margin: 0 0 var(--space-3, 12px); letter-spacing: -0.01em; }
+.fn-article:lang(th) .fn-title, .fn-article[lang="th"] .fn-title { line-height: 1.45; letter-spacing: 0; }
+.fn-article .fn-summary { font-size: 20px; line-height: 1.55; color: var(--ink-soft, #5B6069); margin: 0 0 var(--space-6, 24px); }
+.fn-article .fn-meta { font-family: var(--font-mono, monospace); font-size: 12.5px; color: var(--ink-faint, #8B909A); margin: 0 0 var(--space-6, 24px); }
+.fn-article hr.fn-rule { border: 0; border-top: 1px solid var(--line, #DFDCD4); margin: 0 0 var(--space-6, 24px); height: 0; }
+.fn-article hr.fn-rule::after { content: none; }
+
+.fn-article .fn-body > * + * { margin-top: 1.1em; }
+.fn-article p { margin: 0; }
+.fn-article h2, .fn-article h3 { font-family: var(--fn-head); font-weight: 500; line-height: 1.3; margin: 1.8em 0 0; }
+.fn-article h2 { font-size: 26px; }
+.fn-article h3 { font-size: 21px; }
+.fn-article h2 + *, .fn-article h3 + * { margin-top: 0.6em; }
+.fn-article strong { font-weight: 600; }
+.fn-article em { font-style: italic; }
+.fn-article a { color: var(--accent, #8A5F24); text-decoration: underline; text-decoration-color: var(--accent-line, #D9C6A0); text-underline-offset: 3px; }
+.fn-article a:hover { text-decoration-color: var(--accent, #8A5F24); }
+.fn-article blockquote { margin: 1.4em 0; padding: 0.1em 0 0.1em 1.1em; border-left: 3px solid var(--accent-line, #D9C6A0); color: var(--ink-soft, #5B6069); }
+.fn-article blockquote p + p { margin-top: 0.7em; }
+.fn-article ul, .fn-article ol { margin: 0; padding-left: 1.4em; }
+.fn-article li + li { margin-top: 0.35em; }
+.fn-article hr { border: 0; text-align: center; margin: 2em 0; height: 1em; line-height: 1; }
+.fn-article hr::after { content: "* * *"; letter-spacing: 0.6em; color: var(--ink-faint, #8B909A); font-family: var(--font-mono, monospace); }
+
+@media (max-width: 680px) {
+  .fn-article { font-size: 17px; }
+  .fn-article .fn-title { font-size: 28px; }
+  .fn-article .fn-summary { font-size: 18px; }
+  .fn-article h2 { font-size: 23px; }
+}

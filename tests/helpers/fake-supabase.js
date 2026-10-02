@@ -4,14 +4,22 @@
 // the unique rules of availability and availability_blocks, and "missing table" simulation (migration not run).
 const crypto = require('crypto');
 
+// Field Notes tables: the unique rules and the "on delete cascade" links the real migration (0006) has.
+const FN_UNIQUE = {
+  fieldnotes_posts: [(r) => r.slug],
+  fieldnotes_categories: [(r) => 'slug:' + r.slug, (r) => 'name:' + String(r.name).toLowerCase()],
+  fieldnotes_post_categories: [(r) => r.post_id + '|' + r.category_id],
+};
+
 function createFakeDb(seed = {}) {
-  const tables = { availability: [], availability_blocks: [], admin_actions: [], bookings: [], ...seed };
+  const tables = { availability: [], availability_blocks: [], admin_actions: [], bookings: [], fieldnotes_posts: [], fieldnotes_categories: [], fieldnotes_post_categories: [], ...seed };
   const missing = new Set();
   const log = { queries: 0, writes: [] };
 
   // column defaults the real tables have
-  const DEFAULTS = { availability: { booked: false, locked_until: null, locked_by: null }, availability_blocks: { start_time: null, reason: null }, bookings: { status: 'pending' } };
-  const mk = (t, p) => ({ id: crypto.randomUUID(), created_at: new Date().toISOString(), ...(DEFAULTS[t] || {}), ...p });
+  const DEFAULTS = { availability: { booked: false, locked_until: null, locked_by: null }, availability_blocks: { start_time: null, reason: null }, bookings: { status: 'pending' },
+    fieldnotes_posts: { summary: null, body_md: '', lang: 'en', thai_font: 'noto-sans-thai', cover_image_url: null, status: 'draft', published_at: null, version: 1 } };
+  const mk = (t, p) => ({ id: crypto.randomUUID(), created_at: new Date().toISOString(), ...(t === 'fieldnotes_posts' ? { updated_at: new Date().toISOString() } : {}), ...(DEFAULTS[t] || {}), ...p });
 
   const missingErr = (t) => ({ code: 'PGRST205', message: `Could not find the table 'public.${t}' in the schema cache` });
   const val = (v) => (v === 'null' ? null : v);
@@ -21,6 +29,7 @@ function createFakeDb(seed = {}) {
     if (table === 'availability_blocks') {
       return rows.some((r) => r.date === row.date && (row.start_time == null ? r.start_time == null : r.start_time === row.start_time));
     }
+    if (FN_UNIQUE[table]) return FN_UNIQUE[table].some((key) => rows.some((r) => key(r) === key(row)));
     return false;
   }
 
@@ -111,6 +120,9 @@ function createFakeDb(seed = {}) {
       if (this.op === 'delete') {
         const hit = rows.filter(match);
         tables[t] = rows.filter((r) => !hit.includes(r));
+        // on delete cascade, like the real foreign keys
+        if (t === 'fieldnotes_posts') tables.fieldnotes_post_categories = (tables.fieldnotes_post_categories || []).filter((l) => !hit.some((h) => h.id === l.post_id));
+        if (t === 'fieldnotes_categories') tables.fieldnotes_post_categories = (tables.fieldnotes_post_categories || []).filter((l) => !hit.some((h) => h.id === l.category_id));
         hit.forEach((r) => log.writes.push({ table: t, op: 'delete', row: r }));
         return done(this.returning ? hit : null);
       }
