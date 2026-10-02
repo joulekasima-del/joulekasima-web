@@ -126,3 +126,4 @@ body.admin { min-height: 100vh; }
   .bk-actions .admin-btn { flex: 1 1 100%; }
   .bk-run { flex-direction: column; gap: 4px; }
 }
+.admin-top-links { display: flex; gap: var(--space-5); align-items: baseline; }
