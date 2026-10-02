@@ -26,6 +26,10 @@ module.exports = async (req, res) => {
       res.status(409).json({ error: 'Sessions need to be booked at least 1 day in advance.' });
       return;
     }
+    if (err.message === 'BEYOND_WINDOW') {
+      res.status(409).json({ error: 'That date is beyond the last bookable day.' });
+      return;
+    }
     console.error('still/hold error', err);
     res.status(500).json({ error: 'Could not hold that slot.' });
   }

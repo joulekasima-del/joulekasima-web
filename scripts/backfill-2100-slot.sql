@@ -6,7 +6,7 @@
 --
 -- Scope: dates from :today_utc through :window_end that already have at least one row.
 --   :today_utc  = the UTC date "today" (lib/availability.js todayISO()), e.g. '2026-09-30'
---   :window_end = today_utc + 103 days (lib/availability.js windowEndISO()), e.g. '2027-01-11'
+--   :window_end = the last bookable day (lib/availability.js windowEndISO(), set in still.config.js), e.g. '2027-12-31'
 -- Past dates are skipped on purpose.
 --
 -- Preview (no writes) - how many rows this will insert:

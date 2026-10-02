@@ -215,6 +215,10 @@
 
     const nowYM = +today.slice(0, 4) * 12 + (+today.slice(5, 7) - 1);
     $('cal-prev').disabled = viewYear * 12 + viewMonth <= nowYM;
+    // Next arrow: off once the following month starts after the last bookable day (windowEnd is the customer's local date).
+    const nextY = viewMonth === 11 ? viewYear + 1 : viewYear;
+    const nextM = viewMonth === 11 ? 0 : viewMonth + 1;
+    $('cal-next').disabled = !!windowEnd && isoDate(nextY, nextM, 1) > windowEnd;
   }
 
   $('cal-prev').addEventListener('click', () => {

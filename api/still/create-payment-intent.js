@@ -4,6 +4,7 @@ const { generateBookingReference } = require('../../lib/booking-ref');
 const cfg = require('../../lib/config');
 const Tz = require('../../assets/timezone');
 const { findBlockedSlots } = require('../../lib/blocks');
+const { isBeyondWindow } = require('../../lib/availability');
 
 // PostgREST/Postgres error for a column that doesn't exist yet (migration 0004 not applied).
 function isMissingColumnError(err) {
@@ -61,6 +62,12 @@ module.exports = async (req, res) => {
         res.status(409).json({ error: 'One of your held slots has expired. Please pick your times again.' });
         return;
       }
+    }
+
+    // The server enforces the last bookable day too (a held slot can never be past it, but never charge for one that is).
+    if (slots.some((s) => isBeyondWindow(s.date))) {
+      res.status(409).json({ error: 'One of your chosen times is beyond the last bookable day. Please pick your times again.' });
+      return;
     }
 
     // Re-check owner blocks before anything is charged (a block may have been added after the hold was placed).
